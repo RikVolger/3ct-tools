@@ -1,0 +1,23 @@
+[project]
+name = "tri_ct_tools"
+version = "0.0.1"
+authors = [
+    { name="Rik Volger", email="rvolger@gmail.com" },
+]
+description = "Tools for data inspection of the 3-angle CT setup at TUD-ChemE"
+readme = "README.md"
+requires-python = ">=3.12"
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "Operating System :: OS Independent",
+]
+license = "MIT"
+license-files = ["LICEN[cs]E*"]
+
+[project.urls]
+Homepage = "https://github.com/RikVolger/tri_ct_tools"
+Issues = "https://github.com/RikVolger/tri_ct_tools/issues"
+
+[build-system]
+requires = ["setuptools>=77"]
+build-backend = "setuptools.build_meta"

@@ -1,0 +1,42 @@
+# folders containing the folders with measurement and scatter
+roots:
+# - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-13 Rik Cropper\02_preprocessed
+# - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-18 Rik\02_preprocessed
+# - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-19 Rik\02_preprocessed
+# - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-25 Rik\02_preprocessed
+# - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed
+# - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\02_preprocessed
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-07-07 Rik\02_preprocessed
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-07-09 Rik\02_preprocessed
+cameras:
+- 1
+- 2
+- 3
+scatter_IDs:
+# The order is important here, the first is for camera 1, second for 2, third for 3
+- S23D1
+- S13D2
+- S12D3
+# average flag - if True, scatter correction is done on average images. If
+# false, scatter-correction is done per-frame. Per-frame behaviour is currently
+# undefined
+average: True
+frames:
+  measurement:
+    start: 50
+    stop: 1300
+  full:
+    start: 50
+    stop: 240
+  empty:
+    start: 50
+    stop: 240
+  dark:
+    start: 50
+    stop: 240
+  scatter:
+    start: 50
+    stop: 1300
+img:
+  width: 1548
+  height: 300

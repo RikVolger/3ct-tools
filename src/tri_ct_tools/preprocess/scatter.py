@@ -3,15 +3,8 @@ import yaml
 from pathlib import Path
 import warnings
 
-from tri_ct_tools.image.reader import multicam_mean
+from tri_ct_tools.image.reader import multicam_mean, singlecam_mean
 from tri_ct_tools.image.writer import array_to_tif
-
-
-def load_averaged(directory, frames, cams, img_shape):
-    framelist = range(int(frames['start']), int(frames['stop']))
-    img_float = multicam_mean(directory, cams, framelist, img_shape)
-    img_int = img_float.astype(np.int32)
-    return img_int
 
 
 def write_images(img, folder: Path, cams):
@@ -57,7 +50,7 @@ def scatter_correct(yaml_file="inputs/scatter.yaml"):
                 continue
             exp_name = subdir.name
 
-            if 'Scatter' in exp_name:
+            if 'Scatter' in exp_name or 'scatter' in exp_name:
                 continue
 
             n_missing = 0
@@ -82,7 +75,7 @@ def scatter_correct(yaml_file="inputs/scatter.yaml"):
             else:
                 frames = frames['measurement']
 
-            images = load_averaged(subdir, frames, cameras, img_shape)
+            images = multicam_mean(subdir, cameras, frames, img_shape).astype(np.int32)
             scatter_images = np.zeros_like(images)
             for i, sc_ID in enumerate(scatters):
                 # Stick the right scatter identifier inbetween second-to-last and last
@@ -93,16 +86,13 @@ def scatter_correct(yaml_file="inputs/scatter.yaml"):
                                   stacklevel=2)
                     continue
 
-                # [ ] Update to use singlecam mean reader, doing 32 bit conversion right here
-                scatter_images[i, ...] = load_averaged(
-                    scatter_dir,
-                    frames,
-                    [i+1],
-                    img_shape)
+                cam_folder = scatter_dir / f"camera {i+1}"
+                img = singlecam_mean(cam_folder, frames, img_shape).astype(np.int32)
+                scatter_images[i, ...] = img
 
             print("Correcting image...")
             corrected_images = images - scatter_images
 
-            of = output_folder / exp_name
+            exp_out_folder = output_folder / exp_name
 
-            write_images(corrected_images, of, cameras)
+            write_images(corrected_images, exp_out_folder, cameras)

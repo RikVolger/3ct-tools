@@ -1,3 +1,5 @@
+from pathlib import Path
+
 import numpy as np
 import tifffile
 
@@ -39,7 +41,7 @@ def single(img_file=None, img_folder=None, frame=None):
     raise ValueError
 
 
-def singlecam_mean(cam_folder, frames, img_shape, dark=None):
+def singlecam_mean(cam_folder: Path, frames, img_shape, dark=None):
     """Read the frames in cam_folder, and return a time-averaged image
 
     Args:
@@ -54,8 +56,12 @@ def singlecam_mean(cam_folder, frames, img_shape, dark=None):
     """
     img = np.zeros(img_shape)
     print_reading(cam_folder)
-    img_files = [cam_folder / f"img_{fr}.tif" for fr in frames]
-    img = tifffile.imread(img_files).mean(axis=0)
+    average_file = cam_folder / 'average.tif'
+    if average_file.exists():
+        img = tifffile.imread(average_file)
+    else:
+        img_files = [cam_folder / f"img_{fr}.tif" for fr in frames]
+        img = tifffile.imread(img_files).mean(axis=0)
     if dark is not None:
         img -= dark
     return img
@@ -83,7 +89,7 @@ def singlecam_series(cam_folder, frames, img_shape, dark=None):
     return scan_img
 
 
-def multicam_mean(folder, cameras, frames, img_shape, dark=None):
+def multicam_mean(folder: Path, cameras, frames, img_shape, dark=None):
     """Read images from multiple cameras, and return the time-averaged image
 
     Args:

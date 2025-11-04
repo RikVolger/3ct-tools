@@ -1,10 +1,38 @@
 from pathlib import Path
+import numpy as np
 
 import matplotlib.pyplot as plt
 
 from tri_ct_tools.convert.geometry import cate_to_astra, plot_full_geom
 from tri_ct_tools.image.reader import singlecam_mean
 from tri_ct_tools.inspect.beam_hardening import single_cam_analysis
+
+
+def BHC(I_BH, I_empty, coefficients, mu_eff):
+    # range of possible distances through liquid (for interpolation)
+    x_values = np.linspace(0, 20, 2000)
+    # y value to fit
+    lnII = -np.log(I_BH/I_empty)
+
+    # predicted y values based on polynomial and x-values
+    P_x_values = np.polyval(coefficients, x_values)
+    # use interpolation to determine ditacne through liquid based on actual data
+    x_fit_values = np.interp(lnII, P_x_values, x_values)
+
+    I_noBH = np.exp(-mu_eff * x_fit_values) * I_empty
+
+    return I_noBH
+
+
+def calc_coef_mu(d, ln_rel_intensity, mu_range=3, poly_degree=3):
+
+    coefficients = np.polyfit(d, ln_rel_intensity, poly_degree)
+    # mu calculation based on pathlengths under 3 cm
+    mask = d < mu_range
+
+    mu_eff = np.sum(d[mask] * ln_rel_intensity[mask]) / np.sum(d[mask]**2)
+
+    return coefficients, mu_eff
 
 
 if __name__ == "__main__":
@@ -46,5 +74,7 @@ if __name__ == "__main__":
         single_cam_analysis(geoms_all_cams, images, cam, det, output_path)
 
     plot_full_geom(geoms_all_cams, det)
+
+    calc_coef_mu(left_half_x, ln_left)
 
     plt.show()

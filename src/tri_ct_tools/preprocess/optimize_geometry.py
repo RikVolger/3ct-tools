@@ -2,11 +2,9 @@ from pathlib import Path
 
 import numpy as np
 from scipy.optimize import minimize
-import matplotlib.pyplot as plt
 
 from tri_ct_tools.convert.geometry import calc_distances, cate_to_astra, d_through_column, pixel_coordinates
 from tri_ct_tools.image.reader import singlecam_mean
-from tri_ct_tools.preprocess.beam_hardening import single_cam_analysis
 
 
 def optimize_geometry(geoms_all_cams, cameras, det, img_all_cams, verbosity="figure"):

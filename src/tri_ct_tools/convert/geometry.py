@@ -71,7 +71,8 @@ def pixel_coordinates(dX, dY, dZ, uX, uY, uZ, vX, vY, vZ, rows, cols):
     return x, y, z
 
 
-def d_through_column(x_coords, y_coords, z_coords, srcX, srcY, srcZ, det, diameter_type='inner'):
+def d_through_column(x_coords, y_coords, z_coords, srcX, srcY, srcZ, det,
+                     diameter_type='inner') -> np.ndarray:
     # Directional vector is build up of a, b and c
     a = x_coords - srcX     # in x direction
     b = y_coords - srcY     # in y direction
@@ -160,9 +161,8 @@ def calc_distances(geoms_all_cams, cam, det) -> np.ndarray:
     (srcX, srcY, srcZ, dX, dY, dZ, uX, uY, uZ, vX, vY, vZ) = geoms_all_cams[cam]
 
     x_coords, y_coords, z_coords = pixel_coordinates(dX, dY, dZ, uX, uY, uZ, vX, vY, vZ, rows, cols)
-    
+
     d = d_through_column(x_coords, y_coords, z_coords, srcX, srcY, srcZ, det, diameter_type='inner')
     d_outer = d_through_column(x_coords, y_coords, z_coords, srcX, srcY, srcZ, det, diameter_type='outer')
 
     return d, d_outer
-

@@ -1,17 +1,10 @@
 import numpy as np
 import matplotlib.pyplot as plt
-import pandas as pd
 
 from tri_ct_tools.convert.geometry import calc_distances
 
 
-def single_cam_analysis(
-        geoms_all_cams,
-        images,
-        cam,
-        det,
-        output_path,
-        rows=[720, 780]):
+def single_cam_analysis(geoms_all_cams, images, cam, det, rows=[720, 780]):
     d, _ = calc_distances(geoms_all_cams, cam, det)
 
     image_full, image_empty = images
@@ -39,22 +32,12 @@ def single_cam_analysis(
     image_overlay(cam, d, image_full, image_empty, row_start, col_start, ln_intensity)
 
     # distance through water
-    d = d.flatten()
-    I_empty = image_empty.flatten()
-    I_full = image_full.flatten()
+    d_flat = d.flatten()
 
-    ln_intensity = ln_intensity.flatten()
-    effective_attenuation = ln_intensity / d
+    ln_intensity_flat = ln_intensity.flatten()
+    effective_attenuation = ln_intensity_flat / d_flat
 
-    result = pd.DataFrame()
-    result['distance_liquid'] = d
-    result['-ln_intensity'] = ln_intensity
-    result['effective_attenuation'] = effective_attenuation
-    result['I_empty'] = I_empty
-    result['I_full'] = I_full
-    result.to_csv(output_path / 'intensity.csv')
-
-    intensity_attenuation_plot(cam, d, ln_intensity, effective_attenuation)
+    intensity_attenuation_plot(cam, d_flat, ln_intensity_flat, effective_attenuation)
 
     # Define the value range
     min_value = 16000
@@ -64,7 +47,7 @@ def single_cam_analysis(
     points = np.where(
         (image_full >= min_value) &
         (image_full <= max_value))
-    no_column = d == 0
+    no_column = d_flat == 0
 
     plot_outliers(image_full, points, no_column)
 
@@ -156,4 +139,5 @@ def image_overlay(cam, d, image_full, image_empty, row_start, col_start, ln_inte
     ax[2].set_ylabel("cm")
     ax[2].legend(loc="center")
     ax1r.legend(loc="lower center")
+
     return fig

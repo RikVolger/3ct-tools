@@ -1,23 +1,18 @@
 from pathlib import Path
 
 import numpy as np
+import pandas as pd
 from scipy.optimize import minimize
 
 from tri_ct_tools.convert.geometry import calc_distances, cate_to_astra, d_through_column, pixel_coordinates
 from tri_ct_tools.image.reader import singlecam_mean
 
 
-def optimize_geometry(geoms_all_cams, cameras, det, img_all_cams, verbosity="figure"):
-    middle_line = det['rows'] // 2
-    window_height = 10
-    row_start = middle_line - (window_height // 2)
-    row_end = middle_line + (window_height // 2)
-    # shift origin (X, Y, Z)
-    shift_ori_optim = optimize_origin(geoms_all_cams, cameras, det, img_all_cams,
-                                      row_start, row_end)
-    x_shift, y_shift, z_shift = shift_ori_optim
-
-    geoms_ori_opt = geoms_all_cams
+def opt_ori_fun(shift, geoms_all_cams, row_start, row_end, cameras, det, img_all_cams):
+    err = 0
+    x_shift, y_shift, z_shift = shift
+    rows = det['rows']
+    cols = det['cols']
     for cam in cameras:
         (srcX, srcY, srcZ, dX, dY, dZ, uX, uY, uZ, vX, vY, vZ) = geoms_all_cams[cam]
         # Shift source coordinates
@@ -28,28 +23,38 @@ def optimize_geometry(geoms_all_cams, cameras, det, img_all_cams, verbosity="fig
         dX += x_shift
         dY += y_shift
         dZ += z_shift
-        geoms_ori_opt[cam] = [srcX, srcY, srcZ, dX, dY, dZ, uX, uY, uZ, vX, vY, vZ]
 
-    shift_det_optim = optimize_det(cameras, det, img_all_cams, row_start, row_end, geoms_ori_opt)
-    shift_det_optim = shift_det_optim.reshape(3, 3)
+        x_coords, y_coords, z_coords = pixel_coordinates(dX, dY, dZ, uX, uY, uZ, vX, vY, vZ, rows, cols)
 
-    print("Optimized shifts:")
-    print(f"geom (XYZ): {shift_ori_optim}")
-    print(f"det1 (XYZ): {shift_det_optim[0, :]}")
-    print(f"det2 (XYZ): {shift_det_optim[1, :]}")
-    print(f"det3 (XYZ): {shift_det_optim[2, :]}")
+        d = d_through_column(x_coords, y_coords, z_coords, srcX, srcY, srcZ, det, diameter_type='inner')
+        # d_mum = d * 10_000  # from cm to micrometer
+        # d_mum_int = d_mum.astype(np.int32)
+        # d = d_mum_int
+        image_full, image_empty = img_all_cams[cam]
 
-    geoms_det_opt = geoms_ori_opt
-    for cam in cameras:
-        (srcX, srcY, srcZ, dX, dY, dZ, uX, uY, uZ, vX, vY, vZ) = geoms_all_cams[cam]
-        d_xshift, d_yshift, d_zshift = shift_det_optim[cam, :]
-        # Shift detector center coordinates
-        dX += d_xshift
-        dY += d_yshift
-        dZ += d_zshift
-        geoms_det_opt[cam] = [srcX, srcY, srcZ, dX, dY, dZ, uX, uY, uZ, vX, vY, vZ]
+        d = d[row_start:row_end, :]
+        image_empty = image_empty[row_start:row_end, :]
+        image_full = image_full[row_start:row_end, :]
 
-    return geoms_det_opt
+        d_mask = d > 0
+        d = d[d_mask]
+        image_empty = image_empty[d_mask]
+        image_full = image_full[d_mask]
+
+        # mean_distance = d.flatten()
+        d = d.flatten()
+        I_empty = image_empty.flatten()
+        I_full = image_full.flatten()
+
+        ln_intensity = -np.log(I_full/I_empty)
+
+        sorted_index = np.argsort(d)
+
+        ln_intensity_sorted = ln_intensity[sorted_index]
+        diffs = np.diff(ln_intensity_sorted)
+
+        err += np.sum(diffs**2)
+    return err
 
 
 def optimize_origin(geoms_all_cams, cameras, det, img_all_cams, row_start, row_end):
@@ -77,21 +82,19 @@ def optimize_origin(geoms_all_cams, cameras, det, img_all_cams, row_start, row_e
     return shift_ori_optim
 
 
-def opt_ori_fun(shift, geoms_all_cams, row_start, row_end, cameras, det, img_all_cams):
+def opt_det_fun(shift, geoms_all_cams, row_start, row_end, cameras, det, img_all_cams):
     err = 0
-    x_shift, y_shift, z_shift = shift
+    camshifts = np.array(shift).reshape(3, 3)
     rows = det['rows']
     cols = det['cols']
     for cam in cameras:
         (srcX, srcY, srcZ, dX, dY, dZ, uX, uY, uZ, vX, vY, vZ) = geoms_all_cams[cam]
-        # Shift source coordinates
-        srcX += x_shift
-        srcY += y_shift
-        srcZ += z_shift
+
+        d_xshift, d_yshift, d_zshift = camshifts[cam, :]
         # Shift detector center coordinates
-        dX += x_shift
-        dY += y_shift
-        dZ += z_shift
+        dX += d_xshift
+        dY += d_yshift
+        dZ += d_zshift
 
         x_coords, y_coords, z_coords = pixel_coordinates(dX, dY, dZ, uX, uY, uZ, vX, vY, vZ, rows, cols)
 
@@ -154,51 +157,49 @@ def optimize_det(cameras, det, img_all_cams, row_start, row_end, geoms_ori_opt):
     return shift_det_optim
 
 
-def opt_det_fun(shift, geoms_all_cams, row_start, row_end, cameras, det, img_all_cams):
-    err = 0
-    camshifts = np.array(shift).reshape(3, 3)
-    rows = det['rows']
-    cols = det['cols']
+def _opt_geom(geoms_all_cams, cameras, det, img_all_cams,
+              window_height=10, verbosity="figure"):
+    middle_line = det['rows'] // 2
+    row_start = middle_line - (window_height // 2)
+    row_end = middle_line + (window_height // 2)
+    # shift origin (X, Y, Z)
+    shift_ori_optim = optimize_origin(geoms_all_cams, cameras, det, img_all_cams,
+                                      row_start, row_end)
+    x_shift, y_shift, z_shift = shift_ori_optim
+
+    geoms_ori_opt = geoms_all_cams
     for cam in cameras:
         (srcX, srcY, srcZ, dX, dY, dZ, uX, uY, uZ, vX, vY, vZ) = geoms_all_cams[cam]
+        # Shift source coordinates
+        srcX += x_shift
+        srcY += y_shift
+        srcZ += z_shift
+        # Shift detector center coordinates
+        dX += x_shift
+        dY += y_shift
+        dZ += z_shift
+        geoms_ori_opt[cam] = [srcX, srcY, srcZ, dX, dY, dZ, uX, uY, uZ, vX, vY, vZ]
 
-        d_xshift, d_yshift, d_zshift = camshifts[cam, :]
+    shift_det_optim = optimize_det(cameras, det, img_all_cams, row_start, row_end, geoms_ori_opt)
+    shift_det_optim = shift_det_optim.reshape(3, 3)
+
+    print("Optimized shifts:")
+    print(f"geom (XYZ): {shift_ori_optim}")
+    print(f"det1 (XYZ): {shift_det_optim[0, :]}")
+    print(f"det2 (XYZ): {shift_det_optim[1, :]}")
+    print(f"det3 (XYZ): {shift_det_optim[2, :]}")
+
+    geoms_det_opt = geoms_ori_opt
+    for cam in cameras:
+        (srcX, srcY, srcZ, dX, dY, dZ, uX, uY, uZ, vX, vY, vZ) = geoms_all_cams[cam]
+        d_xshift, d_yshift, d_zshift = shift_det_optim[cam, :]
         # Shift detector center coordinates
         dX += d_xshift
         dY += d_yshift
         dZ += d_zshift
+        geoms_det_opt[cam] = [srcX, srcY, srcZ, dX, dY, dZ, uX, uY, uZ, vX, vY, vZ]
 
-        x_coords, y_coords, z_coords = pixel_coordinates(dX, dY, dZ, uX, uY, uZ, vX, vY, vZ, rows, cols)
-
-        d = d_through_column(x_coords, y_coords, z_coords, srcX, srcY, srcZ, det, diameter_type='inner')
-        # d_mum = d * 10_000  # from cm to micrometer
-        # d_mum_int = d_mum.astype(np.int32)
-        # d = d_mum_int
-        image_full, image_empty = img_all_cams[cam]
-
-        d = d[row_start:row_end, :]
-        image_empty = image_empty[row_start:row_end, :]
-        image_full = image_full[row_start:row_end, :]
-
-        d_mask = d > 0
-        d = d[d_mask]
-        image_empty = image_empty[d_mask]
-        image_full = image_full[d_mask]
-
-        # mean_distance = d.flatten()
-        d = d.flatten()
-        I_empty = image_empty.flatten()
-        I_full = image_full.flatten()
-
-        ln_intensity = -np.log(I_full/I_empty)
-
-        sorted_index = np.argsort(d)
-
-        ln_intensity_sorted = ln_intensity[sorted_index]
-        diffs = np.diff(ln_intensity_sorted)
-
-        err += np.sum(diffs**2)
-    return err
+    return geoms_det_opt
 
 
 def geometry_optimizer(
@@ -221,7 +222,8 @@ def geometry_optimizer(
         img_empty = singlecam_mean(path_empty, framerange, img_shape)
         img_all_cams.append((img_full, img_empty))
 
-    geoms_optim = optimize_geometry(geoms_all_cams, cameras, det, img_all_cams)
+    geoms_optim = _opt_geom(geoms_all_cams, cameras, det, img_all_cams,
+                            window_height=10)
 
     output_path = img_path_base / '00_calib'
     output_path.mkdir(exist_ok=True)
@@ -229,8 +231,28 @@ def geometry_optimizer(
     for cam in cameras:
         d, _ = calc_distances(geoms_optim, cam, det)
         np.save(output_path / f'distances_cam{cam+1}.npy', d)
+        path_full = img_path_base / full_img_folder / f"camera {cam+1}"
+        path_empty = img_path_base / empty_img_folder / f"camera {cam+1}"
+        img_full = singlecam_mean(path_full, framerange, img_shape)
+        img_empty = singlecam_mean(path_empty, framerange, img_shape)
+
+        ln_intensity = -np.log(img_full / img_empty)
+        effective_attenuation = ln_intensity / d
+
+        result = pd.DataFrame()
+        result['distance_liquid'] = d.flatten()
+        result['-ln_intensity'] = ln_intensity.flatten()
+        result['effective_attenuation'] = effective_attenuation
+        result.to_csv(output_path / f'intensity_cam{cam+1}.csv')
+
+        metadata = {
+            'src_full': path_full,
+            'src_empty': path_empty
+        }
+        pd.DataFrame(metadata).to_csv(output_path / f'intensity_cam{cam+1}_metadata.csv')
 
     np.save(output_path / 'bhc_optimized_geom.npy', geoms_optim)
+
     print(f"Saved optimized geometry in {output_path}")
     return geoms_optim
 

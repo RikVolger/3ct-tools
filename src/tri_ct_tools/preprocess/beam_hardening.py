@@ -11,7 +11,7 @@ from tri_ct_tools.image.writer import array_to_tif
 from tri_ct_tools.inspect.beam_hardening import single_cam_analysis
 
 
-def BHC(I_BH, I_empty, coefficients, mu_eff):
+def BHC(I_BH, I_empty, coefficients, mu_eff, offset):
     # range of possible distances through liquid (for interpolation)
     x_values = np.linspace(0, 20, 1000)
     # y value to fit
@@ -22,7 +22,7 @@ def BHC(I_BH, I_empty, coefficients, mu_eff):
     # use interpolation to determine ditance through liquid based on actual data
     x_fit_values = np.interp(lnII, P_x_values, x_values)
 
-    I_noBH = np.exp(-mu_eff * x_fit_values) * I_empty
+    I_noBH = np.exp(-mu_eff * x_fit_values + offset) * I_empty
 
     # After beam hardening corrections, nan values can appear in image. Interpolate.
     if np.any(np.isnan(I_noBH)):
@@ -54,100 +54,174 @@ def calc_coef_mu(d, ln_rel_intensity, mu_range=3, poly_degree=3):
     # mu calculation based on pathlengths under 3 cm
     mask = d < mu_range
 
-    mu_eff = np.sum(d[mask] * ln_rel_intensity[mask]) / np.sum(d[mask]**2)
+    # mu_eff = np.sum(d[mask] * ln_rel_intensity[mask]) / np.sum(d[mask]**2)
+    mu_eff = np.sum(ln_rel_intensity[mask]) / np.sum(d[mask])
+    offset = coefficients[-1]
+    mu_eff2 = (np.polyval(coefficients, mu_range) - offset) / mu_range
+    print(f"original:  y = {mu_eff:.2f}.x")
+    print(f"offsetted: y = {mu_eff2:.2f}.x + {offset:.2f}")
 
-    return coefficients, mu_eff
+    return coefficients, mu_eff, offset
+
+
+def log_line_plot(
+        path_full,
+        path_empty,
+        voltage,
+        cam,
+        geoms_all_cams,
+        det,
+        row_start=740,
+        row_end=760):
+
+    img_full = singlecam_mean(path_full, framerange, img_shape)
+    img_empty = singlecam_mean(path_empty, framerange, img_shape)
+    d, _ = calc_distances(geoms_all_cams, cam, det)
+
+    # Take a horizontal slice to avoid probes screwing with the next steps
+    assert row_end > row_start
+    d = d[row_start:row_end, :]
+    img_full = img_full[row_start:row_end, :]
+    img_empty = img_empty[row_start:row_end, :]
+
+    # Only consider values where the beam passed through the column
+    d_mask = d > 0
+    d = d[d_mask]
+    img_full = img_full[d_mask]
+    img_empty = img_empty[d_mask]
+
+    # Calculate relative intensity
+    rel_intensity = img_full / img_empty
+
+    # Clean up to avoid problems in logarithm
+    mask = rel_intensity > 0
+    rel_intensity_log = -np.log(rel_intensity[mask])
+
+    # Fit polynomial to the data
+    coeff, mu_eff = calc_coef_mu(d[mask], rel_intensity_log, 7)
+
+    # Perform beam hardening correction
+    img_full_BHC = BHC(img_full, img_empty, coeff, mu_eff)
+    rel_intensity_noBH = img_full_BHC / img_empty
+
+    mask = rel_intensity_noBH > 0
+    rel_intensity_log_noBH = -np.log(rel_intensity_noBH[mask])
+
+    # Plot the results
+    d_vals = np.linspace(0, d.max(), 100)
+    p_fit = np.polyval(coeff, d_vals)
+
+    fig, ax = plt.subplots(1, 1)
+    ax.plot(d[mask], rel_intensity_log, 'o', alpha=0.1, label='data')
+    ax.plot(d[mask], rel_intensity_log_noBH, 'o', alpha=0.1, label='data-BHC')
+    ax.plot(d_vals, p_fit, label='polyfit')
+    ax.plot(d_vals, d_vals*mu_eff, label='constant attenuation')
+    ax.set_title(
+        f"Camera {cam+1}, {voltage} kV"
+        R" - $\mu_{eff}$ = "
+        f"{mu_eff:.3f}"
+    )
+    ax.set_ylabel("Attenuation as $-ln I_{full}/I_{empty}$")
+    ax.set_xlabel("Pathlength (cm)")
+    ax.legend()
+    return fig
+
+
+def beam_hardening_coefficients(d, img_full, img_empty):
+    
+    # Take a horizontal slice to avoid probes screwing with the next steps
+    # row_start = 300
+    # row_end = 1100
+    # d = d[row_start:row_end, :]
+    # img_full = img_full[row_start:row_end, :]
+    # img_empty = img_empty[row_start:row_end, :]
+    
+    # Only consider values where the beam passed through the column
+    d_mask = d > 0
+    d = d[d_mask]
+    img_full = img_full[d_mask]
+    img_empty = img_empty[d_mask]
+    
+    # Calculate relative intensity
+    rel_intensity = img_full / img_empty
+    
+    # Clean up to avoid problems in logarithm
+    mask = rel_intensity > 0
+    rel_intensity_log = -np.log(rel_intensity[mask])
+    
+    # Fit polynomial to the data
+    coeff, mu_eff = calc_coef_mu(d[mask], rel_intensity_log, 5)
+    return coeff, mu_eff
+
+
+def get_coefficients(det, ROI, geoms_all_cams, cam, img_full, img_empty):
+    d, _ = calc_distances(geoms_all_cams, cam, det)
+
+    # Crop out probes and tubes
+    img_full = img_full[ROI[0]:ROI[1], :]
+    img_empty = img_empty[ROI[0]:ROI[1], :]
+    d = d[ROI[0]:ROI[1], :]
+
+    coeff, mu_eff = beam_hardening_coefficients(d, img_full, img_empty)
+    return coeff, mu_eff
 
 
 if __name__ == "__main__":
+    
+    input_file = Path("inputs/beam_hardening_corrections.yaml")
+    with open(input_file) as bhc_yaml:
+        bhc_input = yaml.safe_load(bhc_yaml)
+
+    det = bhc_input['det']
     # path to geometry
-    geom_path = Path(R'u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-13 Rik Cropper\00_calib\bhc_optimized_geom.npy')
-    output_path = geom_path.parent.parent / "04_bhcorrected"
-    output_path.mkdir(exist_ok=True)
-
-    det = {
-        "rows": 1524,        # Number of rows in the detector
-        "cols": 1548,        # Number of columns in the detector
-        "pixel_width": 0.0198,      # Pixel width in cm
-        "pixel_height": 0.0198,     # Pixel height in cm
-        'det_width': 30.7,      # cm, detector width
-        'det_height': 30.2,     # cm, detector height
-        'column_inner_D': 19.2,   # cm
-        'column_outer_D': 20.0  # cm
-    }
+    geom_path = Path(bhc_input['geom_path'])
+    framerange = [bhc_input['framerange']['start'], bhc_input['framerange']['stop']]
     img_shape = (det['cols'], det['rows'])
-    framerange = range(50, 200)
+    ROI = bhc_input['ROI']
+    cameras = bhc_input['cameras']
 
-    cameras = range(0, 3)
-
-    # [ ] If the geom path points to a file from the bhc optimization, it is not
-    # cate-like, and should be loaded in a simplified manner. Need to devise a
-    # check for that.
+    # If the geom path points to a file from the bhc optimization, it is not
+    # cate-like, and can be loaded in a simplified manner
     if geom_path.name == "bhc_optimized_geom.npy":
         geoms_all_cams = np.load(geom_path)
     else:
         geoms_all_cams = cate_to_astra(path=geom_path, det=det)
 
-    img_path_base = Path(R'u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-13 Rik Cropper')
-
     plot_full_geom(geoms_all_cams, det)
     plt.show()
-    # for cam in cameras:
-    #     # paths to camera folders
-    #     path_full = img_path_base / f'03_scattercorrected/WideCrop_Full_120kV_22Hz/camera {cam+1}'
-    #     path_empty = img_path_base / f'03_scattercorrected/WideCrop_Empty_120kV_22Hz/camera {cam+1}'
-    #     img_full = singlecam_mean(path_full, framerange, img_shape)
-    #     img_empty = singlecam_mean(path_empty, framerange, img_shape)
-    #     images = (img_full, img_empty)
-    #     # calculate distances
-    #     single_cam_analysis(geoms_all_cams, images, cam, det)
-    # plt.show()
-    for cam in cameras:
-        path_full = img_path_base / f'03_scattercorrected/WideCrop_Full_120kV_22Hz/camera {cam+1}'
-        path_empty = img_path_base / f'03_scattercorrected/WideCrop_Empty_120kV_22Hz/camera {cam+1}'
-        img_full = singlecam_mean(path_full, framerange, img_shape)
-        img_empty = singlecam_mean(path_empty, framerange, img_shape)
-        images = (img_full, img_empty)
-        d, _ = calc_distances(geoms_all_cams, cam, det)
-        # Take a horizontal slice to avoid probes screwing with the next steps
-        row_start = 740
-        row_end = 760
-        d = d[row_start:row_end, :]
-        img_full = img_full[row_start:row_end, :]
-        img_empty = img_empty[row_start:row_end, :]
-        # Only consider values where the beam passed through the column
-        d_mask = d > 0
-        d = d[d_mask]
-        img_full = img_full[d_mask]
-        img_empty = img_empty[d_mask]
-        # Calculate relative intensity
-        rel_intensity = img_full / img_empty
-        # Clean up to avoid problems in logarithm
-        mask = rel_intensity > 0
-        rel_intensity_log = -np.log(rel_intensity[mask])
-        # Fit polynomial to the data
-        coeff, mu_eff = calc_coef_mu(d[mask], rel_intensity_log, 7)
-        # Perform beam hardening correction
-        img_full_noBH = BHC(img_full, img_empty, coeff, mu_eff)
-        rel_intensity_noBH = img_full_noBH / img_empty
 
-        mask = rel_intensity_noBH > 0
-        rel_intensity_log_noBH = -np.log(rel_intensity_noBH[mask])
-        # Plot the results
-        d_vals = np.linspace(0, d.max(), 100)
-        p_fit = np.polyval(coeff, d_vals)
+    series = bhc_input['series']
 
-        fig, ax = plt.subplots(1, 1)
-        ax.plot(d[mask], rel_intensity_log, 'o', alpha=0.1, label='data')
-        ax.plot(d[mask], rel_intensity_log_noBH, 'o', alpha=0.1, label='data-BHC')
-        ax.plot(d_vals, p_fit, label='polyfit')
-        ax.plot(d_vals, d_vals*mu_eff, label='constant attenuation')
-        ax.set_title(
-            f"Attenuation plot for cam {cam+1}"
-            R" - $\mu_{eff}$ = "
-            f"{mu_eff:.3f}"
-        )
-        ax.legend()
+    for s in series:
+        name = s['name']
+        full_path = Path(s['full'])
+        empty_path = Path(s['empty'])
+        empty_copy_path = Path(s['empty_copy'])
 
-        output_path = img_path_base / '00_calib'
-    plt.show()
+        print(f"\nRunning beam hardening correction for {name}")
+
+        for meas, cam in itertools.product(s['meas'], cameras):
+            full_path_cam = full_path / f"camera {cam+1}"
+            empty_path_cam = empty_path / f"camera {cam+1}"
+            meas_path_cam = Path(meas['input']) / f"camera {cam+1}"
+            img_full = singlecam_mean(full_path_cam, framerange, img_shape)
+            img_empty = singlecam_mean(empty_path_cam, framerange, img_shape)
+            img_meas = singlecam_mean(meas_path_cam, framerange, img_shape)
+            coeff, mu_eff = get_coefficients(det, ROI, geoms_all_cams, cam,
+                                             img_full, img_empty)
+
+            meas_bhc = BHC(img_meas, img_empty, coeff, mu_eff)
+
+            meas_output_path = Path(meas['output'])
+            meas_output_cam = meas_output_path / f"camera {cam+1}"
+            array_to_tif(meas_bhc, meas_output_cam, 'average.tif')
+            bhc_coefficients = {
+                'mu_eff': mu_eff,
+                'poly_coefficients': coeff
+            }
+            # Even though BHC does nothing on empty, want to have it in the same folder.
+            array_to_tif(img_empty, empty_copy_path / f"camera {cam+1}", 'average.tif')
+            
+            output_file = meas_output_cam / f'bhc_coefficients_cam{cam+1}.yaml'
+            with open(output_file, 'w') as outfile:
+                yaml.dump(bhc_coefficients, outfile, default_flow_style=False)

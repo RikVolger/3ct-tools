@@ -1,0 +1,44 @@
+geom_path: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-13 Rik Cropper\00_calib\bhc_optimized_geom.npy
+det:
+  rows: 1524              # Number of rows in the detector
+  cols: 1548              # Number of columns in the detector
+  pixel_width: 0.0198     # Pixel width in cm
+  pixel_height: 0.0198    # Pixel height in cm
+  det_width: 30.7         # cm, detector width
+  det_height: 30.2        # cm, detector height
+  column_inner_D: 19.2    # cm
+  column_outer_D: 20.0    # cm
+framerange:
+  start: 50
+  stop: 200
+  step: 1
+ROI: [450, 1100]    # Area to use for BHC characterization (avoids probes and tubes)
+cameras: [0, 1, 2]
+series:
+  - name: 1500x1500Crop 120kV
+    full: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Full_120kV_22Hz
+    empty: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Empty_120kV_22Hz
+    empty_copy: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_Empty_120kV_22Hz
+    meas:
+      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_150lmin_120kV_22Hz
+        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_150lmin_120kV_22Hz
+      - input: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Full_120kV_22Hz
+        output: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_Full_120kV_22Hz
+  - name: 1500x1500Crop 135kV
+    full: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Full_135kV_22Hz
+    empty: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Empty_135kV_22Hz
+    empty_copy: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_Empty_135kV_22Hz
+    meas:
+      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_150lmin_135kV_22Hz
+        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_150lmin_135kV_22Hz
+      - input: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Full_135kV_22Hz
+        output: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_Full_135kV_22Hz
+  - name: 1500x1500Crop 150kV
+    full: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Full_150kV_22Hz
+    empty: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Empty_150kV_22Hz
+    empty_copy: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_Empty_150kV_22Hz
+    meas:
+      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_150lmin_150kV_22Hz
+        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_150lmin_150kV_22Hz
+      - input: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Full_150kV_22Hz
+        output: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_Full_150kV_22Hz

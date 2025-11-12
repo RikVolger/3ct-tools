@@ -1,25 +1,37 @@
+import itertools
 from pathlib import Path
 import numpy as np
 
 import matplotlib.pyplot as plt
+import yaml
 
 from tri_ct_tools.convert.geometry import calc_distances, cate_to_astra, plot_full_geom
 from tri_ct_tools.image.reader import singlecam_mean
+from tri_ct_tools.image.writer import array_to_tif
 from tri_ct_tools.inspect.beam_hardening import single_cam_analysis
 
 
 def BHC(I_BH, I_empty, coefficients, mu_eff):
     # range of possible distances through liquid (for interpolation)
-    x_values = np.linspace(0, 20, 2000)
+    x_values = np.linspace(0, 20, 1000)
     # y value to fit
     lnII = -np.log(I_BH/I_empty)
 
     # predicted y values based on polynomial and x-values
     P_x_values = np.polyval(coefficients, x_values)
-    # use interpolation to determine ditacne through liquid based on actual data
+    # use interpolation to determine ditance through liquid based on actual data
     x_fit_values = np.interp(lnII, P_x_values, x_values)
 
     I_noBH = np.exp(-mu_eff * x_fit_values) * I_empty
+
+    # After beam hardening corrections, nan values can appear in image. Interpolate.
+    if np.any(np.isnan(I_noBH)):
+        nanmask = np.isnan(I_noBH)
+        I_noBH[nanmask] = np.interp(
+            np.flatnonzero(nanmask),
+            np.flatnonzero(~nanmask),
+            I_noBH[~nanmask]
+        )
 
     return I_noBH
 

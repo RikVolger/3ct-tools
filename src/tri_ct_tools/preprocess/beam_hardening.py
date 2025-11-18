@@ -61,7 +61,7 @@ def calc_coef_mu(d, ln_rel_intensity, mu_range=3, poly_degree=3):
     print(f"original:  y = {mu_eff:.2f}.x")
     print(f"offsetted: y = {mu_eff2:.2f}.x + {offset:.2f}")
 
-    return coefficients, mu_eff, offset
+    return coefficients, mu_eff2, offset
 
 
 def log_line_plot(
@@ -98,10 +98,10 @@ def log_line_plot(
     rel_intensity_log = -np.log(rel_intensity[mask])
 
     # Fit polynomial to the data
-    coeff, mu_eff = calc_coef_mu(d[mask], rel_intensity_log, 7)
+    coeff, mu_eff, offset = calc_coef_mu(d[mask], rel_intensity_log)
 
     # Perform beam hardening correction
-    img_full_BHC = BHC(img_full, img_empty, coeff, mu_eff)
+    img_full_BHC = BHC(img_full, img_empty, coeff, mu_eff, offset)
     rel_intensity_noBH = img_full_BHC / img_empty
 
     mask = rel_intensity_noBH > 0
@@ -150,8 +150,8 @@ def beam_hardening_coefficients(d, img_full, img_empty):
     rel_intensity_log = -np.log(rel_intensity[mask])
     
     # Fit polynomial to the data
-    coeff, mu_eff = calc_coef_mu(d[mask], rel_intensity_log, 5)
-    return coeff, mu_eff
+    coeff, mu_eff, offset = calc_coef_mu(d[mask], rel_intensity_log,    5)
+    return coeff, mu_eff, offset
 
 
 def get_coefficients(det, ROI, geoms_all_cams, cam, img_full, img_empty):
@@ -162,12 +162,12 @@ def get_coefficients(det, ROI, geoms_all_cams, cam, img_full, img_empty):
     img_empty = img_empty[ROI[0]:ROI[1], :]
     d = d[ROI[0]:ROI[1], :]
 
-    coeff, mu_eff = beam_hardening_coefficients(d, img_full, img_empty)
-    return coeff, mu_eff
+    coeff, mu_eff, offset = beam_hardening_coefficients(d, img_full, img_empty)
+    return coeff, mu_eff, offset
 
 
 if __name__ == "__main__":
-    
+
     input_file = Path("inputs/beam_hardening_corrections.yaml")
     with open(input_file) as bhc_yaml:
         bhc_input = yaml.safe_load(bhc_yaml)
@@ -207,16 +207,17 @@ if __name__ == "__main__":
             img_full = singlecam_mean(full_path_cam, framerange, img_shape)
             img_empty = singlecam_mean(empty_path_cam, framerange, img_shape)
             img_meas = singlecam_mean(meas_path_cam, framerange, img_shape)
-            coeff, mu_eff = get_coefficients(det, ROI, geoms_all_cams, cam,
-                                             img_full, img_empty)
+            coeff, mu_eff, offset = get_coefficients(det, ROI, geoms_all_cams,
+                                                     cam, img_full, img_empty)
 
-            meas_bhc = BHC(img_meas, img_empty, coeff, mu_eff)
+            meas_bhc = BHC(img_meas, img_empty, coeff, mu_eff, offset)
 
             meas_output_path = Path(meas['output'])
             meas_output_cam = meas_output_path / f"camera {cam+1}"
             array_to_tif(meas_bhc, meas_output_cam, 'average.tif')
             bhc_coefficients = {
                 'mu_eff': mu_eff,
+                'offset': offset,
                 'poly_coefficients': coeff
             }
             # Even though BHC does nothing on empty, want to have it in the same folder.

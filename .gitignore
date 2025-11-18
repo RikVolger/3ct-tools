@@ -1,6 +1,7 @@
 # User-specific
 *scratch*.py
 output/*
+data/*
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

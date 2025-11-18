@@ -47,6 +47,7 @@ series:
   - name: 1500x1500Crop 120kV non-SC
     full: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed\1500x1500Crop_Full_120kV_22Hz
     empty: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed\1500x1500Crop_Empty_120kV_22Hz
+    dark: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\01_raw\Dark_22Hz
     empty_copy: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_Empty_120kV_22Hz
     meas:
       - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\02_preprocessed\1500x1500Crop_150lmin_120kV_22Hz
@@ -56,6 +57,7 @@ series:
   - name: 1500x1500Crop 135kV non-SC
     full: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed\1500x1500Crop_Full_135kV_22Hz
     empty: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed\1500x1500Crop_Empty_135kV_22Hz
+    dark: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\01_raw\Dark_22Hz
     empty_copy: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_Empty_135kV_22Hz
     meas:
       - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\02_preprocessed\1500x1500Crop_150lmin_135kV_22Hz
@@ -65,6 +67,7 @@ series:
   - name: 1500x1500Crop 150kV non-SC
     full: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed\1500x1500Crop_Full_150kV_22Hz
     empty: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed\1500x1500Crop_Empty_150kV_22Hz
+    dark: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\01_raw\Dark_22Hz
     empty_copy: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_Empty_150kV_22Hz
     meas:
       - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\02_preprocessed\1500x1500Crop_150lmin_150kV_22Hz

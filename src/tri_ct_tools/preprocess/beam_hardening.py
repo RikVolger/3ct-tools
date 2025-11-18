@@ -196,6 +196,10 @@ if __name__ == "__main__":
         name = s['name']
         full_path = Path(s['full'])
         empty_path = Path(s['empty'])
+        if 'dark' in s.keys() and s['dark'] is not None:
+            dark_path = Path(s['dark'])
+        else:
+            dark_path = None
         empty_copy_path = Path(s['empty_copy'])
 
         print(f"\nRunning beam hardening correction for {name}")
@@ -207,6 +211,12 @@ if __name__ == "__main__":
             img_full = singlecam_mean(full_path_cam, framerange, img_shape)
             img_empty = singlecam_mean(empty_path_cam, framerange, img_shape)
             img_meas = singlecam_mean(meas_path_cam, framerange, img_shape)
+            if dark_path is not None:
+                dark_path_cam = dark_path / f"camera {cam+1}"
+                img_dark = singlecam_mean(dark_path_cam, framerange, img_shape)
+                img_full = img_full - img_dark
+                img_empty = img_empty - img_dark
+                img_meas = img_meas - img_dark
             coeff, mu_eff, offset = get_coefficients(det, ROI, geoms_all_cams,
                                                      cam, img_full, img_empty)
 

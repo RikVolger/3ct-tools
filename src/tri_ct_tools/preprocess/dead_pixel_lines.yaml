@@ -1,0 +1,18 @@
+# This file contains the positions of known horizontal and vertical dead pixel lines.
+# While these lines sometimes shift one or two pixels between measurements, this file
+# is meant to stay 'as-is'. Any shifts should be defined in inputs/dead_pixel.yaml.
+cam1:
+  vertical:
+    top: [44, 130, 216, 302, 388, 474, 485, 517, 561, 647,      733, 819, 905, 991, 1034, 1078, 1164, 1220, 1250, 1336, 1422, 1508]
+    bot: [44, 130, 216, 302, 388, 474, 485, 518, 561, 647, 695, 733, 819, 905, 991, 1035, 1078, 1164, 1220, 1250, 1336, 1422, 1508]
+  double_vert: [774, 775]
+cam2:
+  vertical:
+    top: [44, 130, 198, 216, 302, 388, 474, 489, 517, 561, 647, 733, 819, 905, 991, 1034, 1078, 1164, 1250, 1336, 1422, 1508]
+    bot: [43, 129,      215, 301, 387, 473,      517, 560, 646, 732, 818, 904, 990, 1034, 1077, 1163, 1249, 1335, 1421, 1507]
+  double_vert: [775, 776]
+cam3:
+  vertical:
+    top: [44, 130, 216, 302, 388, 474, 517, 561, 647, 733, 819, 905, 991, 1034, 1078, 1164, 1250, 1336, 1422, 1508]
+    bot: [43, 129, 215, 301, 387, 473, 517, 560, 646, 732, 818, 904, 990, 1034, 1077, 1163, 1249, 1335, 1421, 1507]
+  double_vert: [774, 775]

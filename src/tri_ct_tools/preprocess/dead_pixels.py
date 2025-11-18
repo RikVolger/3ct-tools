@@ -157,13 +157,13 @@ def dead_pixel_correction(image, cam_no, offsets, VROI=[0, 1523]):
     # Correct hline position for VROI settings
     hline = 763 - start_line
 
-    with open('dead_pixel_lines.yaml') as dpl_file:
+    with open('src/tri_ct_tools/preprocess/dead_pixel_lines.yaml') as dpl_file:
         dpl = yaml.safe_load(dpl_file)
 
     vert_tophalf = offsets[cam_no]['vertical']['top'] + np.array(dpl[f'cam{cam_no}']['vertical']['top'])
     vert_bothalf = offsets[cam_no]['vertical']['bot'] + np.array(dpl[f'cam{cam_no}']['vertical']['bot'])
 
-    double_vert = np.array(dpl[f'cam{cam_no}']['horizontal']) + offsets[cam_no]['horizontal']
+    double_vert = np.array(dpl[f'cam{cam_no}']['double_vert']) + offsets[cam_no]['double_vert']
 
     image = correct_lines(image, VROI, hline, vert_tophalf, vert_bothalf, double_vert)
 
@@ -185,7 +185,7 @@ def process_file(i, file, n_cam, VROI, target_dir, total_files, offsets):
     if output_file.exists() and filecmp.cmp(file, output_file):
         print(f"File {file.name} already exists, skipping")
     else:
-        print(f"Frame number {i} / {total_files}")
+        print(f"Frame number {i + 1} / {total_files}")
         image_array = np.array(Image.open(file))
 
         image_array = dead_pixel_correction(image_array, n_cam, offsets, VROI=VROI)
@@ -240,11 +240,11 @@ def main(source_dir, target_dir):
 
             # Create output directory
             output_directory = preprocessed_dir / f"camera {n_cam}"
-            os.makedirs(output_directory, exist_ok=True)
+            output_directory.mkdir(parents=True, exist_ok=True)
 
             if copy_raw:
                 raw_output_dir = raw_dir / f"camera {n_cam}"
-                os.makedirs(raw_output_dir, exist_ok=True)
+                raw_output_dir.mkdir(parents=True, exist_ok=True)
 
             # Copy "timestamp data.txt" files for camera folder
             os.system(f'robocopy "{camdir}" "{output_directory}" "timestamp data.txt"  /njh /njs /ndl /nc /ns')
@@ -279,9 +279,4 @@ if __name__ == "__main__":
     else:
         target_dir = False
 
-    if len(sys.argv) > 3:
-        copy_raw = bool(sys.argv[3])
-    else:
-        copy_raw = False
-
-    main(source_dir, target_dir, copy_raw)
+    main(source_dir, target_dir)

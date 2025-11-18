@@ -12,7 +12,7 @@ offsets:
     vertical:
       top: -1
       bot: -1
-    double_vert: -1
+    double_vert: 0
   3:
     vertical:
       top: -1

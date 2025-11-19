@@ -1,0 +1,20 @@
+input_folder: C:\Users\rikvolger\Codebase\3ct-tools\data\S
+output_folder: C:\Users\rikvolger\Codebase\3ct-tools\data\U\02_preprocessed
+copy_raw: True
+mirror: False
+offsets:
+  1:
+    vertical:
+      top: -1
+      bot: -2
+    double_vert: 0
+  2:
+    vertical:
+      top: -1
+      bot: -1
+    double_vert: 0
+  3:
+    vertical:
+      top: -1
+      bot: -1
+    double_vert: 0

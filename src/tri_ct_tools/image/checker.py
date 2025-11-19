@@ -40,12 +40,13 @@ def plot_intensity(image, threshold=50, vmin=0, vmax=None,
     colormap.set_over("r")
     colormap.set_under("b")
 
-    fig, ax = plt.subplots(1, 1, *_plot_kwargs)
-    ax.imshow(image, cmap=colormap, vmin=vmin, vmax=vmax)
+    fig, ax = plt.subplots(1, 1, **_plot_kwargs)
+    im = ax.imshow(image, cmap=colormap, vmin=vmin, vmax=vmax)
     ax.set_title(title)
     ax.set_aspect('equal')
+    ax.axis('off')
 
-    return fig
+    return fig, im
 
 
 def plot_vertical_profile(image, line_position=400, label=None, fig=None):

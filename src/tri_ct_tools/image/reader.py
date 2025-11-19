@@ -3,6 +3,8 @@ from pathlib import Path
 import numpy as np
 import tifffile
 
+from tri_ct_tools.image.writer import array_to_tif
+
 
 def print_reading(file):
     print(f"Reading {file}")
@@ -62,6 +64,8 @@ def singlecam_mean(cam_folder: Path, frames, img_shape, dark=None):
     else:
         img_files = [cam_folder / f"img_{fr}.tif" for fr in frames]
         img = tifffile.imread(img_files).mean(axis=0)
+        # Save average for future use
+        array_to_tif(img, cam_folder, 'average')
     if dark is not None:
         img -= dark
     return img

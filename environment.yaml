@@ -1,0 +1,13 @@
+name: tri-ct-tools
+channels:
+  - defaults
+dependencies:
+  - pyyaml
+  - pandas
+  - matplotlib
+  - numpy
+  - scipy
+  - python
+  - pillow
+  - tifffile
+prefix: C:\Users\rikvolger\anaconda3\envs\tri-ct-tools

@@ -30,5 +30,5 @@ def array_to_tif(img: np.ndarray, output_folder: Path, filename: str):
     output_folder.mkdir(parents=True, exist_ok=True)
     output_file = output_folder / filename
     output_tif = output_file.with_suffix(".tif")
-    tifffile.imwrite(output_tif, img)
+    tifffile.imwrite(output_tif, img.astype(np.int32))
     return output_tif

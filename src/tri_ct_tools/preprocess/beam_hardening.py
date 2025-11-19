@@ -175,7 +175,20 @@ if __name__ == "__main__":
     det = bhc_input['det']
     # path to geometry
     geom_path = Path(bhc_input['geom_path'])
-    framerange = [bhc_input['framerange']['start'], bhc_input['framerange']['stop']]
+    framerange = {
+        'full': range(bhc_input['framerange']['full']['start'],
+                      bhc_input['framerange']['full']['stop'],
+                      bhc_input['framerange']['full']['step']),
+        'empty': range(bhc_input['framerange']['empty']['start'],
+                       bhc_input['framerange']['empty']['stop'],
+                       bhc_input['framerange']['empty']['step']),
+        'dark': range(bhc_input['framerange']['dark']['start'],
+                      bhc_input['framerange']['dark']['stop'],
+                      bhc_input['framerange']['dark']['step']),
+        'meas': range(bhc_input['framerange']['measurement']['start'],
+                      bhc_input['framerange']['measurement']['stop'],
+                      bhc_input['framerange']['measurement']['step']),
+    }
     img_shape = (det['cols'], det['rows'])
     ROI = bhc_input['ROI']
     cameras = bhc_input['cameras']
@@ -200,23 +213,24 @@ if __name__ == "__main__":
             dark_path = Path(s['dark'])
         else:
             dark_path = None
+            img_dark = None
         empty_copy_path = Path(s['empty_copy'])
 
         print(f"\nRunning beam hardening correction for {name}")
 
         for meas, cam in itertools.product(s['meas'], cameras):
+            if dark_path is not None:
+                dark_path_cam = dark_path / f"camera {cam+1}"
+                img_dark = singlecam_mean(dark_path_cam, framerange['dark'], img_shape)
             full_path_cam = full_path / f"camera {cam+1}"
             empty_path_cam = empty_path / f"camera {cam+1}"
             meas_path_cam = Path(meas['input']) / f"camera {cam+1}"
-            img_full = singlecam_mean(full_path_cam, framerange, img_shape)
-            img_empty = singlecam_mean(empty_path_cam, framerange, img_shape)
-            img_meas = singlecam_mean(meas_path_cam, framerange, img_shape)
-            if dark_path is not None:
-                dark_path_cam = dark_path / f"camera {cam+1}"
-                img_dark = singlecam_mean(dark_path_cam, framerange, img_shape)
-                img_full = img_full - img_dark
-                img_empty = img_empty - img_dark
-                img_meas = img_meas - img_dark
+            img_full = singlecam_mean(full_path_cam, framerange['full'], img_shape, img_dark)
+            img_empty = singlecam_mean(empty_path_cam, framerange['empty'], img_shape, img_dark)
+            if "Full" in str(meas_path_cam) and "preprocessed" in str(meas_path_cam):
+                img_meas = singlecam_mean(meas_path_cam, framerange['full'], img_shape, img_dark)
+            else:
+                img_meas = singlecam_mean(meas_path_cam, framerange['meas'], img_shape, img_dark)
             coeff, mu_eff, offset = get_coefficients(det, ROI, geoms_all_cams,
                                                      cam, img_full, img_empty)
 
@@ -224,7 +238,7 @@ if __name__ == "__main__":
 
             meas_output_path = Path(meas['output'])
             meas_output_cam = meas_output_path / f"camera {cam+1}"
-            array_to_tif(meas_bhc, meas_output_cam, 'average.tif')
+            array_to_tif(meas_bhc.astype(np.int32), meas_output_cam, 'average.tif')
             bhc_coefficients = {
                 'mu_eff': mu_eff,
                 'offset': offset,
@@ -232,7 +246,7 @@ if __name__ == "__main__":
             }
             # Even though BHC does nothing on empty, want to have it in the same folder.
             array_to_tif(img_empty, empty_copy_path / f"camera {cam+1}", 'average.tif')
-            
+
             output_file = meas_output_cam / f'bhc_coefficients_cam{cam+1}.yaml'
             with open(output_file, 'w') as outfile:
                 yaml.dump(bhc_coefficients, outfile, default_flow_style=False)

@@ -180,26 +180,10 @@ def _opt_geom(geoms_all_cams, cameras, det, img_all_cams,
         dZ += z_shift
         geoms_ori_opt[cam] = [srcX, srcY, srcZ, dX, dY, dZ, uX, uY, uZ, vX, vY, vZ]
 
-    shift_det_optim = optimize_det(cameras, det, img_all_cams, row_start, row_end, geoms_ori_opt)
-    shift_det_optim = shift_det_optim.reshape(3, 3)
-
     print("Optimized shifts:")
     print(f"geom (XYZ): {shift_ori_optim}")
-    print(f"det1 (XYZ): {shift_det_optim[0, :]}")
-    print(f"det2 (XYZ): {shift_det_optim[1, :]}")
-    print(f"det3 (XYZ): {shift_det_optim[2, :]}")
 
-    geoms_det_opt = geoms_ori_opt
-    for cam in cameras:
-        (srcX, srcY, srcZ, dX, dY, dZ, uX, uY, uZ, vX, vY, vZ) = geoms_all_cams[cam]
-        d_xshift, d_yshift, d_zshift = shift_det_optim[cam, :]
-        # Shift detector center coordinates
-        dX += d_xshift
-        dY += d_yshift
-        dZ += d_zshift
-        geoms_det_opt[cam] = [srcX, srcY, srcZ, dX, dY, dZ, uX, uY, uZ, vX, vY, vZ]
-
-    return geoms_det_opt
+    return geoms_ori_opt
 
 
 def geometry_optimizer(
@@ -242,14 +226,14 @@ def geometry_optimizer(
         result = pd.DataFrame()
         result['distance_liquid'] = d.flatten()
         result['-ln_intensity'] = ln_intensity.flatten()
-        result['effective_attenuation'] = effective_attenuation
+        result['effective_attenuation'] = effective_attenuation.flatten()
         result.to_csv(output_path / f'intensity_cam{cam+1}.csv')
 
         metadata = {
             'src_full': path_full,
             'src_empty': path_empty
         }
-        pd.DataFrame(metadata).to_csv(output_path / f'intensity_cam{cam+1}_metadata.csv')
+        pd.DataFrame(metadata, index=[1]).to_csv(output_path / f'intensity_cam{cam+1}_metadata.csv')
 
     np.save(output_path / 'bhc_optimized_geom.npy', geoms_optim)
 
@@ -261,9 +245,9 @@ if __name__ == "__main__":
     # path to geometry
     geom_path = Path(R'U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-13 Rik Cropper'
                      R'\calib\NeedleCalibration_5degps\geom.npy')
-    img_path_base = Path(R'u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-13 Rik Cropper')
-    full_img_path = '03_scattercorrected/WideCrop_Full_120kV_22Hz'
-    empty_img_path = '03_scattercorrected/WideCrop_Empty_120kV_22Hz'
+    img_path_base = Path(R'u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik')
+    full_img_path = '03_scattercorrected/1500x1500Crop_Full_120kV_22Hz'
+    empty_img_path = '03_scattercorrected/1500x1500Crop_Empty_120kV_22Hz'
 
     det = {
         "rows": 1524,        # Number of rows in the detector

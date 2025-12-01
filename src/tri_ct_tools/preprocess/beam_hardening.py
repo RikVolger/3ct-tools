@@ -227,7 +227,7 @@ if __name__ == "__main__":
             meas_path_cam = Path(meas['input']) / f"camera {cam+1}"
             img_full = singlecam_mean(full_path_cam, framerange['full'], img_shape, img_dark)
             img_empty = singlecam_mean(empty_path_cam, framerange['empty'], img_shape, img_dark)
-            if "Full" in str(meas_path_cam) and "preprocessed" in str(meas_path_cam):
+            if "Full" in str(meas_path_cam):
                 img_meas = singlecam_mean(meas_path_cam, framerange['full'], img_shape, img_dark)
             else:
                 img_meas = singlecam_mean(meas_path_cam, framerange['meas'], img_shape, img_dark)

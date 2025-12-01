@@ -26,8 +26,8 @@ framerange:
     stop: 150
     step: 1
 # Area to use for BHC characterization (avoids probes and tubes)
-# ROI: [450, 1100]    # For full crop
-ROI: [70, 280]      # For 300x1500 crop
+ROI: [450, 1100]    # For full crop
+# ROI: [70, 280]      # For 300x1500 crop
 cameras: [0, 1, 2]
 series:
   - name: 1500x1500Crop 120kV SC

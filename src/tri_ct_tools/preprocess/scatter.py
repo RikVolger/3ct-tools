@@ -31,10 +31,10 @@ def scatter_correct(yaml_file="inputs/scatter.yaml"):
     average = settings['average']
     img_shape = (int(settings['img']['height']), int(settings['img']['width']))
     if average:
-        frames = settings['frames']
+        framerange = settings['frames']
     else:
-        warnings.warn("Scatter correction for time-resolved images is currently "
-                      "undefined. Expect errors.")
+        raise ValueError("Scatter correction for time-resolved images is"
+                         "currently undefined. Expect errors.")
     scatters = settings['scatter_IDs']
 
     # Correct for scatter
@@ -54,7 +54,7 @@ def scatter_correct(yaml_file="inputs/scatter.yaml"):
                 continue
 
             n_missing = 0
-            # TODO add some output to a log file - if all are missing its a warning,
+            # [ ] add some output to a log file - if all are missing its a warning,
             # if one is missing an error. Log file should be marked with
             # datetimestamp.
             for i, sc_ID in enumerate(scatters):
@@ -67,15 +67,19 @@ def scatter_correct(yaml_file="inputs/scatter.yaml"):
                 continue
 
             if "Empty" in exp_name:
-                frames = frames['empty']
+                frange = framerange['empty']
+                frames = range(frange['start'], frange['stop'], frange['step'])
             elif "Full" in exp_name:
-                frames = frames['full']
+                frange = framerange['full']
+                frames = range(frange['start'], frange['stop'], frange['step'])
             elif "Dark" in exp_name:
-                frames = frames['dark']
+                frange = framerange['dark']
+                frames = range(frange['start'], frange['stop'], frange['step'])
             else:
-                frames = frames['measurement']
+                frange = framerange['measurement']
+                frames = range(frange['start'], frange['stop'], frange['step'])
 
-            images = multicam_mean(subdir, cameras, frames, img_shape).astype(np.int32)
+            images = multicam_mean(subdir, cameras, frames, img_shape).astype(np.int16)
             scatter_images = np.zeros_like(images)
             for i, sc_ID in enumerate(scatters):
                 # Stick the right scatter identifier inbetween second-to-last and last
@@ -87,7 +91,7 @@ def scatter_correct(yaml_file="inputs/scatter.yaml"):
                     continue
 
                 cam_folder = scatter_dir / f"camera {i+1}"
-                img = singlecam_mean(cam_folder, frames, img_shape).astype(np.int32)
+                img = singlecam_mean(cam_folder, frames, img_shape).astype(np.int16)
                 scatter_images[i, ...] = img
 
             print("Correcting image...")
@@ -96,3 +100,7 @@ def scatter_correct(yaml_file="inputs/scatter.yaml"):
             exp_out_folder = output_folder / exp_name
 
             write_images(corrected_images, exp_out_folder, cameras)
+
+
+if __name__ == "__main__":
+    scatter_correct()

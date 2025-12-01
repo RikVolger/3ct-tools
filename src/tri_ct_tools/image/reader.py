@@ -27,13 +27,13 @@ def single(img_file=None, img_folder=None, frame=None):
     """
     if img_file is not None:
         print_reading(img_file)
-        img = tifffile.imread(img_file)
+        img = tifffile.imread(img_file).astype(np.int16)
         return img
 
     if None not in [img_folder, frame]:
         img_file = img_folder / f"img_{frame}.tif"
         print_reading(img_file)
-        img = tifffile.imread(img_file)
+        img = tifffile.imread(img_file).astype(np.int16)
         return img
 
     print("""Invalid use of read `read_single`. Provide either:\n
@@ -60,10 +60,10 @@ def singlecam_mean(cam_folder: Path, frames, img_shape, dark=None):
     print_reading(cam_folder)
     average_file = cam_folder / 'average.tif'
     if average_file.exists():
-        img = tifffile.imread(average_file)
+        img = tifffile.imread(average_file).astype(np.int16)
     else:
         img_files = [cam_folder / f"img_{fr}.tif" for fr in frames]
-        img = tifffile.imread(img_files).mean(axis=0)
+        img = tifffile.imread(img_files).mean(axis=0).astype(np.int16)
         # Save average for future use
         array_to_tif(img, cam_folder, 'average')
     if dark is not None:
@@ -87,7 +87,7 @@ def singlecam_series(cam_folder, frames, img_shape, dark=None):
     scan_img = np.zeros((len(frames), *img_shape))
     print_reading(cam_folder)
     img_files = [cam_folder / f"img_{fr}.tif" for fr in frames]
-    scan_img[:, :, :] = tifffile.imread(img_files)
+    scan_img[:, :, :] = tifffile.imread(img_files).astype(np.int16)
     if dark is not None:
         scan_img -= dark
     return scan_img

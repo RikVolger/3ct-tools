@@ -6,6 +6,8 @@ import numpy as np
 from PIL import Image
 from pathlib import Path
 
+from tri_ct_tools.image.writer import array_to_tif
+
 
 def read_detector_settings(source_dir):
     filename = Path(source_dir) / "settings  data.txt"
@@ -179,18 +181,21 @@ def find_subdirectories(directory: Path) -> list[Path]:
     return subdirectories
 
 
-def process_file(i, file, n_cam, VROI, target_dir, total_files, offsets):
+def process_file(i, file: Path, n_cam, VROI, target_dir, total_files, offsets):
     output_file = target_dir / file.name
 
     if output_file.exists() and filecmp.cmp(file, output_file):
         print(f"File {file.name} already exists, skipping")
     else:
         print(f"Frame number {i + 1} / {total_files}")
+        # [ ] Would like to use reader functionalities here, but would overload
+        # the outputs. Maybe create with a printing flag?
         image_array = np.array(Image.open(file))
 
         image_array = dead_pixel_correction(image_array, n_cam, offsets, VROI=VROI)
 
-        Image.fromarray(image_array).save(output_file)
+        array_to_tif(image_array, target_dir, file.name)
+        # Image.fromarray(image_array).save(output_file)
 
 
 def main(source_dir, target_dir):

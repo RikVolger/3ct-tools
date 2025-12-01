@@ -6,8 +6,8 @@ roots:
 # - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-25 Rik\02_preprocessed
 # - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed
 # - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\02_preprocessed
-- U:\Xray RPT ChemE\X-ray\Xray_data\2025-07-07 Rik\02_preprocessed
-- U:\Xray RPT ChemE\X-ray\Xray_data\2025-07-09 Rik\02_preprocessed
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-07-07 Rik\02_preprocessed    # Mind: 300x1500 crop
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-07-09 Rik\02_preprocessed    # Mind: 300x1500 crop
 cameras:
 - 1
 - 2
@@ -25,18 +25,23 @@ frames:
   measurement:
     start: 50
     stop: 1300
+    step: 1
   full:
     start: 50
     stop: 240
+    step: 1
   empty:
     start: 50
     stop: 240
+    step: 1
   dark:
     start: 50
     stop: 240
+    step: 1
   scatter:
     start: 50
     stop: 1300
+    step: 1
 img:
   width: 1548
   height: 300

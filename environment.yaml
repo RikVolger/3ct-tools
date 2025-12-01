@@ -10,4 +10,6 @@ dependencies:
   - python
   - pillow
   - tifffile
+  - jupyter
+  - ipympl
 prefix: C:\Users\rikvolger\anaconda3\envs\tri-ct-tools

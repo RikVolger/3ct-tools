@@ -1,0 +1,50 @@
+input_folder: 
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-12 Rik Cropper\01_raw
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-13 Rik Cropper\01_raw
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-19 Rik\01_raw
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-25 Rik\01_raw
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\01_raw
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\01_raw
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-07-07 Rik\01_raw
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-07-09 Rik\01_raw
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-07-11 Rik\01_raw
+output_folder: 
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-12 Rik Cropper\02_preprocessed
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-13 Rik Cropper\02_preprocessed
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-19 Rik\02_preprocessed
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-25 Rik\02_preprocessed
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\02_preprocessed
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-07-07 Rik\02_preprocessed
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-07-09 Rik\02_preprocessed
+# Darks: If a single folder is provided, this will be used for all. If image sizes
+# don't match (some VROI, some MAG0), errors ensue.
+# If multiple folders are provided, these will all be loaded and the software will
+# choose between them based on settings
+dark:
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-13 Rik Cropper\01_raw\WideCrop_Dark_22Hz
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\01_raw\Dark_22Hz
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\01_raw\Dark_110Hz
+darkframes:
+  start: 20
+  stop: 100
+  step: 1
+copy_raw: False
+subtract_dark: True
+mirror: False
+offsets:
+  1:
+    vertical:
+      top: -1
+      bot: -2
+    double_vert: 0
+  2:
+    vertical:
+      top: -1
+      bot: -1
+    double_vert: 0
+  3:
+    vertical:
+      top: -1
+      bot: -1
+    double_vert: 0

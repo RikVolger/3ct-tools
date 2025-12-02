@@ -3,18 +3,24 @@ import sys
 import filecmp
 import yaml
 import numpy as np
+from datetime import datetime
 from PIL import Image
 from pathlib import Path
 
+from tri_ct_tools.image.reader import single, singlecam_mean
 from tri_ct_tools.image.writer import array_to_tif
 
 
-def read_detector_settings(source_dir):
-    filename = Path(source_dir) / "settings  data.txt"
+def read_detector_settings(source_dir: Path):
+    filename = source_dir / "settings  data.txt"
 
-    cam_mode = False
+    cam_mode = ''
     VROI = [0, 1]
+    framerate = 0
+    timestamp = datetime.now()
+    cameras = []
 
+    settings = {}
     with open(filename) as f:
         for line in f:
             split_line = line.split(":")
@@ -26,20 +32,24 @@ def read_detector_settings(source_dir):
                 (key, val) = split_line
 
             val = val.strip()
+            settings[key] = val
 
-            if key == "Cam Mode":
-                cam_mode = val
-                if cam_mode == "MAG0":
-                    VROI = [0, 1523]
-                    break
+    cam_mode = str(settings['Cam Mode'])
+    if cam_mode == "MAG0":
+        VROI = [0, 1523]
 
-            if cam_mode == "VROI" and key == "StartLine1":
-                VROI[0] = int(val)
+    if cam_mode == "VROI":
+        VROI[0] = int(settings['StartLine1'])
+        VROI[1] = int(settings['StopLine1'])
 
-            if cam_mode == "VROI" and key == "StopLine1":
-                VROI[1] = int(val)
+    framerate = int(settings['Framerate'])
+    timestamp = datetime.strptime(settings['Date/time'], '%Y%m%d_%H%M%S_0')
 
-    return (cam_mode, VROI)
+    for i in range(1, 4):
+        if settings[f'Cam {i}'] == "On":
+            cameras.append(i)
+
+    return (cam_mode, VROI, framerate, timestamp, cameras)
 
 
 def vertical_interpolation(image, x, y):
@@ -180,16 +190,39 @@ def find_subdirectories(directory: Path, subdirectories=[]) -> list[Path]:
     return subdirectories
 
 
-def process_file(i, file: Path, n_cam, VROI, target_dir, total_files, offsets):
+def list_subdirectories(source_dir: str | list, target_dir: str | list) -> tuple[list, list]:
+    if isinstance(source_dir, str) and isinstance(target_dir, str):
+        # Simple case: find subdirectories and return a list of those, with same
+        # target dir for each
+        subdirs = find_subdirectories(Path(source_dir))
+        target_dirs = [Path(target_dir)] * len(subdirs)
+        return subdirs, target_dirs
+
+    if not isinstance(source_dir, list) and isinstance(target_dir, list):
+        raise ValueError(
+            "Unexpected input types for list_subdirectories(). Arguments should "
+            "be either both strings or both lists"
+        )
+    # get subdirs for each entry in source_dir
+    source_dirs = []
+    target_dirs = []
+    for sdir, tdir in zip(source_dir, target_dir):
+        subdirs = find_subdirectories(Path(sdir))
+        source_dirs += subdirs
+        target_dirs += [Path(tdir)] * len(subdirs)
+
+    return source_dirs, target_dirs
+
+
+def process_file(i, file: Path, n_cam, VROI, target_dir, total_files, offsets, dark_img):
     output_file = target_dir / file.name
 
     if output_file.exists() and filecmp.cmp(file, output_file):
-        print(f"File {file.name} already exists, skipping")
+        print(f"\nFile {file.name} already exists, skipping")
     else:
-        print(f"Frame number {i + 1} / {total_files}")
-        # [ ] Would like to use reader functionalities here, but would overload
-        # the outputs. Maybe create with a printing flag?
-        image_array = np.array(Image.open(file))
+        print(f"Frame number {i + 1} / {total_files}", end='\r', flush=True)
+        image_array = single(file, quiet=True)
+        np.clip(image_array - dark_img, 0, None, out=image_array)
 
         image_array = dead_pixel_correction(image_array, n_cam, offsets, VROI=VROI)
 
@@ -197,44 +230,130 @@ def process_file(i, file: Path, n_cam, VROI, target_dir, total_files, offsets):
         # Image.fromarray(image_array).save(output_file)
 
 
-def main(source_dir, target_dir):
+def load_darks(config):
+    dirs = config['dark']
+    darkframes = range(
+        config['darkframes']['start'],
+        config['darkframes']['stop'],
+        config['darkframes']['step']
+    )
+    # Shortcut for single dark provided.
+    if isinstance(dirs, str):
+        dark_path = Path(dirs)
+        cam_folders = list(dark_path.glob("camera*"))
+        img_shape = single(cam_folders[0] / 'img_10.tif').shape
+        dark_img = np.zeros((len(cam_folders), *img_shape), dtype=np.int16)
+        for i, cam_folder in enumerate(cam_folders):
+            assert cam_folder.is_dir()
+            dark_img[i, ...] = singlecam_mean(cam_folder, darkframes, img_shape)
+        return dark_img
+
+    darks = {}
+    dark_info = [
+        [],     # crop
+        [],     # startline
+        [],     # stopline
+        [],     # image size
+        [],     # framerate
+        [],     # date
+        [],     # cameras
+        [],     # images
+    ]
+    for dir in dirs:
+        dark_path = Path(dir)
+        cam_folders = list(dark_path.glob("camera*"))
+        img_shape = single(cam_folders[0] / 'img_10.tif').shape
+        # load images
+        dark_img = np.zeros((len(cam_folders), *img_shape), dtype=np.int16)
+        for i, cam_folder in enumerate(cam_folders):
+            assert cam_folder.is_dir()
+            dark_img[i, ...] = singlecam_mean(cam_folder, darkframes, img_shape)
+        # Obtain metadata
+        xray_settings = read_detector_settings(dark_path)
+        (cam_mode, VROI, framerate, timestamp, cameras) = xray_settings
+        dark_info[0].append(cam_mode)
+        dark_info[1].append(VROI[0])
+        dark_info[2].append(VROI[1])
+        dark_info[3].append(img_shape)
+        dark_info[4].append(framerate)
+        dark_info[5].append(timestamp)
+        dark_info[6].append(cameras)
+        dark_info[7].append(dark_img)
+
+    # Convert dark info to dictionary for more meaningful indexing
+    darks['crop'] = np.array(dark_info[0])
+    darks['startline'] = np.array(dark_info[1])
+    darks['stopline'] = np.array(dark_info[2])
+    darks['img_shape'] = np.array(dark_info[3])
+    darks['framerate'] = np.array(dark_info[4])
+    darks['timestamp'] = np.array(dark_info[5])
+    darks['cameras'] = dark_info[6]
+    # images will have shape (n_darks, n_cams, *img_shape)
+    darks['images'] = dark_info[7]
+    return darks
+
+
+def pick_dark(source_dir, darks):
+    if isinstance(darks, np.ndarray):
+        return darks
+    source_settings = read_detector_settings(source_dir)
+    cam_folders = list(source_dir.glob("camera*"))
+    img_shape = single(cam_folders[0] / 'img_10.tif').shape
+    (cam_mode, VROI, framerate, timestamp, cameras) = source_settings
+    same_shape = (darks['img_shape'] == img_shape).all(axis=1)
+    same_framerate = darks['framerate'] == framerate
+    assert np.any(same_shape & same_framerate), f"No matching dark found for {source_dir}"
+    if np.sum(same_shape & same_framerate) == 1:
+        dark_img = darks['images'][np.argmax(same_shape & same_framerate)]
+    else:
+        # Pick the closest date
+        dark_img = darks['images'][np.argmin(abs(darks['timestamp'] - timestamp))]
+    return dark_img
+
+
+def main(root_source_dir, root_target_dir):
     # initial processing of raw data (dead pixel correction, rotate, flip, contrast)
-    with open('inputs/dead_pixel.yaml') as dp_file:
+    with open('inputs/dead_pixel_multisource.yaml') as dp_file:
         config = yaml.safe_load(dp_file)
-    if not source_dir:
-        source_dir = config['input_folder']
-        target_dir = Path(config['output_folder'])
+    if not root_source_dir:
+        root_source_dir = config['input_folder']
+        root_target_dir = config['output_folder']
 
     copy_raw = config['copy_raw']
     offsets = config['offsets']
     # VROI = get_VROI_setting()
 
     # Get a list of all subfolders in this folder.
-    subdirectories = find_subdirectories(source_dir)
+    source_dirs, target_dirs = list_subdirectories(root_source_dir, root_target_dir)
+    darks = load_darks(config)
 
-    for subdir in subdirectories:
+    for source_dir, target_dir in zip(source_dirs, target_dirs):
         # skip already preprocessed directories
-        if 'preprocessed' in subdir.name:
+        if 'preprocessed' in source_dir.name:
             continue
 
+        dark_images = pick_dark(source_dir, darks)
+
         # Make output directory
-        preprocessed_dir = target_dir / subdir.name
+        preprocessed_dir = target_dir / source_dir.name
         os.makedirs(preprocessed_dir, exist_ok=True)
 
         if copy_raw:
-            raw_dir = target_dir.parent / '01_raw' / subdir.name
+            raw_dir = target_dir.parent / '01_raw' / source_dir.name
             raw_dir.mkdir(parents=True, exist_ok=True)
 
         # gather settings from "setting  data.txt"
-        (cam_mode, VROI) = read_detector_settings(subdir)
+        xray_settings = read_detector_settings(source_dir)
+        VROI = xray_settings[1]
 
         # Copy "settings  data.txt" files for camera folder
-        os.system(f'robocopy "{subdir}" "{preprocessed_dir}" "settings  data.txt" /njh /njs /ndl /nc /ns')
+        os.system(f'robocopy "{source_dir}" "{preprocessed_dir}" "settings  data.txt" /njh /njs /ndl /nc /ns')
         if copy_raw:
-            os.system(f'robocopy "{subdir}" "{raw_dir}" "settings  data.txt" /njh /njs /ndl /nc /ns')
+            os.system(f'robocopy "{source_dir}" "{raw_dir}" "settings  data.txt" /njh /njs /ndl /nc /ns')
 
-        for n_cam in range(1, 4):
-            camdir = subdir / f'camera {str(n_cam)}'
+        for i, n_cam in enumerate(range(1, 4)):
+            dark_img = dark_images[i, :, :]
+            camdir = source_dir / f'camera {str(n_cam)}'
             # load filenames of all images in directory
             total_files = sum(1 for _ in camdir.glob('img_*.tif'))
 
@@ -255,10 +374,12 @@ def main(source_dir, target_dir):
             if copy_raw:
                 os.system(f'robocopy "{camdir}" "{raw_output_dir}" "timestamp data.txt"  /njh /njs /ndl /nc /ns')
 
-            for i, file in enumerate(camdir.glob("img_*.tif")):
-                process_file(i, file, n_cam, VROI, output_directory, total_files, offsets)
+            print(f"Processing files in {camdir}")
+            for j, file in enumerate(camdir.glob("img_*.tif")):
+                process_file(j, file, n_cam, VROI, output_directory, total_files, offsets, dark_img)
                 if copy_raw:
                     os.system(f'robocopy "{camdir}" "{raw_output_dir}" "{file.name}"  /njh /njs /ndl /nc /ns')
+            print('')
 
 
 if __name__ == "__main__":

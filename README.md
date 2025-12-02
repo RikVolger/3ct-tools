@@ -5,6 +5,13 @@ Python tools for analysis and processing of data from the 3-angle X-ray tomograp
 ## Requirements / environment
 ... To be filled ...
 
+## Dealing with notebooks
+Jupyter notebooks and git don't play nice together. If you're going to run any of
+the notebooks and make git commits, make sure to run the following commands. These 
+register a 'pre-hook', essentially running `nbstripout` before each commit. `nbstripout`
+strips out all notebook outputs, making it much easier for multiple people to work 
+on the notebooks.
+
 ## Building and including the package
 Building the project relies on setuptools and `build`. If you're not sure if 
 `build` is installed, run

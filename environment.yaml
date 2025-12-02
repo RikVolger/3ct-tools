@@ -12,4 +12,7 @@ dependencies:
   - tifffile
   - jupyter
   - ipympl
+  - pip
+  - pip:
+    - pre-commit
 prefix: C:\Users\rikvolger\anaconda3\envs\tri-ct-tools

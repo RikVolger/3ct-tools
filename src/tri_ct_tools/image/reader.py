@@ -6,11 +6,13 @@ import tifffile
 from tri_ct_tools.image.writer import array_to_tif
 
 
-def print_reading(file):
+def print_reading(file, quiet):
+    if quiet:
+        return
     print(f"Reading {file}")
 
 
-def single(img_file=None, img_folder=None, frame=None):
+def single(img_file=None, img_folder=None, frame=None, quiet=False):
     """Load and return a single image
 
     Args:
@@ -26,13 +28,13 @@ def single(img_file=None, img_folder=None, frame=None):
         np.ndarray: Image file as Numpy NDArray
     """
     if img_file is not None:
-        print_reading(img_file)
+        print_reading(img_file, quiet)
         img = tifffile.imread(img_file).astype(np.int16)
         return img
 
     if None not in [img_folder, frame]:
         img_file = img_folder / f"img_{frame}.tif"
-        print_reading(img_file)
+        print_reading(img_file, quiet)
         img = tifffile.imread(img_file).astype(np.int16)
         return img
 
@@ -43,7 +45,7 @@ def single(img_file=None, img_folder=None, frame=None):
     raise ValueError
 
 
-def singlecam_mean(cam_folder: Path, frames, img_shape, dark=None):
+def singlecam_mean(cam_folder: Path, frames, img_shape, dark=None, quiet=False):
     """Read the frames in cam_folder, and return a time-averaged image
 
     Args:
@@ -57,7 +59,7 @@ def singlecam_mean(cam_folder: Path, frames, img_shape, dark=None):
         np.ndarray: 2D Array of size (width, height) containing the time-averaged image
     """
     img = np.zeros(img_shape)
-    print_reading(cam_folder)
+    print_reading(cam_folder, quiet)
     average_file = cam_folder / 'average.tif'
     if average_file.exists():
         img = tifffile.imread(average_file).astype(np.int16)
@@ -71,7 +73,7 @@ def singlecam_mean(cam_folder: Path, frames, img_shape, dark=None):
     return img
 
 
-def singlecam_series(cam_folder, frames, img_shape, dark=None):
+def singlecam_series(cam_folder, frames, img_shape, dark=None, quiet=False):
     """Read images from a single camera folder and return all indicated frames
 
     Args:
@@ -85,7 +87,7 @@ def singlecam_series(cam_folder, frames, img_shape, dark=None):
         np.ndarray: 3D array of size (n_frames, width, height) containing images
     """
     scan_img = np.zeros((len(frames), *img_shape))
-    print_reading(cam_folder)
+    print_reading(cam_folder, quiet)
     img_files = [cam_folder / f"img_{fr}.tif" for fr in frames]
     scan_img[:, :, :] = tifffile.imread(img_files).astype(np.int16)
     if dark is not None:
@@ -93,7 +95,7 @@ def singlecam_series(cam_folder, frames, img_shape, dark=None):
     return scan_img
 
 
-def multicam_mean(folder: Path, cameras, frames, img_shape, dark=None):
+def multicam_mean(folder: Path, cameras, frames, img_shape, dark=None, quiet=False):
     """Read images from multiple cameras, and return the time-averaged image
 
     Args:
@@ -111,11 +113,11 @@ def multicam_mean(folder: Path, cameras, frames, img_shape, dark=None):
     img = np.zeros((len(cameras), *img_shape))
     for i, c in enumerate(cameras):
         img_folder = folder / f"camera {c}"
-        img[i, :, :] = singlecam_mean(img_folder, frames, img_shape, dark)
+        img[i, :, :] = singlecam_mean(img_folder, frames, img_shape, dark, quiet)
     return img
 
 
-def multicam_series(exp_folder, cameras, frames, img_shape, dark=None):
+def multicam_series(exp_folder, cameras, frames, img_shape, dark=None, quiet=False):
     """Read images from multiple cameras and return all frames
 
     Args:
@@ -133,5 +135,5 @@ def multicam_series(exp_folder, cameras, frames, img_shape, dark=None):
     scan_img = np.zeros((len(frames), len(cameras), *img_shape))
     for i, c in enumerate(cameras):
         img_folder = exp_folder / f"camera {c}"
-        scan_img[:, i, :, :] = singlecam_series(img_folder, frames, img_shape, dark)
+        scan_img[:, i, :, :] = singlecam_series(img_folder, frames, img_shape, dark, quiet)
     return scan_img

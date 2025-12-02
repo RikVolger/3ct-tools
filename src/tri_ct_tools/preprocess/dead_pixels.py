@@ -172,8 +172,7 @@ def dead_pixel_correction(image, cam_no, offsets, VROI=[0, 1523]):
     return image
 
 
-def find_subdirectories(directory: Path) -> list[Path]:
-    subdirectories = []
+def find_subdirectories(directory: Path, subdirectories=[]) -> list[Path]:
     for entry in directory.iterdir():
         if entry.is_dir():
             subdirectories.append(entry)
@@ -203,7 +202,7 @@ def main(source_dir, target_dir):
     with open('inputs/dead_pixel.yaml') as dp_file:
         config = yaml.safe_load(dp_file)
     if not source_dir:
-        source_dir = Path(config['input_folder'])
+        source_dir = config['input_folder']
         target_dir = Path(config['output_folder'])
 
     copy_raw = config['copy_raw']

@@ -28,8 +28,7 @@ def read_detector_settings(source_dir: Path):
             # TriggerDelay does not contain the colon, and would break the rest of the flow.
             if len(split_line) < 2:
                 continue
-            else:
-                (key, val) = split_line
+            (key, val) = split_line
 
             val = val.strip()
             settings[key] = val
@@ -302,12 +301,28 @@ def pick_dark(source_dir, darks):
     (cam_mode, VROI, framerate, timestamp, cameras) = source_settings
     same_shape = (darks['img_shape'] == img_shape).all(axis=1)
     same_framerate = darks['framerate'] == framerate
-    assert np.any(same_shape & same_framerate), f"No matching dark found for {source_dir}"
+    full_shape = (darks['img_shape'] == (1524, 1548)).all(axis=1)
     if np.sum(same_shape & same_framerate) == 1:
         dark_img = darks['images'][np.argmax(same_shape & same_framerate)]
-    else:
+    elif np.sum(same_shape & same_framerate) > 1:
         # Pick the closest date
-        dark_img = darks['images'][np.argmin(abs(darks['timestamp'] - timestamp))]
+        timedeltas = abs(darks['timestamp'] - timestamp)
+        valid_idx = np.where(same_shape & same_framerate)[0]
+        idx_date_based = valid_idx[timedeltas[valid_idx].argmin()]
+        # idx_date_based = np.argmin(abs(darks['timestamp'][same_shape & same_framerate] - timestamp))
+        dark_img = darks['images'][idx_date_based]
+    elif np.sum(same_framerate & full_shape) >= 1:
+        # [ ] Alternative situation that is not covered: there is no properly cropped
+        # dark available, but there is a bigger one with the same framerate
+        # Find the shapes that are larger or equal to shape of source
+        dark_img = darks['images'][np.argmax(full_shape & same_framerate)]
+        # Crop to source image size
+        dark_img = dark_img[:, VROI[0]:VROI[1], :]
+    else:
+        raise LookupError(f"Could not find dark image for {source_dir}. No dark "
+                          "images with the same framerate and equal or larger "
+                          "image size provided.")
+
     return dark_img
 
 

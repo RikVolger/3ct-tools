@@ -4,8 +4,8 @@ import filecmp
 import yaml
 import numpy as np
 from datetime import datetime
-from PIL import Image
 from pathlib import Path
+import asyncio
 
 from tri_ct_tools.image.reader import single, singlecam_mean
 from tri_ct_tools.image.writer import array_to_tif
@@ -229,6 +229,27 @@ def process_file(i, file: Path, n_cam, VROI, target_dir, total_files, offsets, d
         # Image.fromarray(image_array).save(output_file)
 
 
+async def process_file_async(i, file: Path, n_cam, VROI, target_dir, total_files, offsets, dark_img, loop:asyncio.EventLoop):
+    output_file = target_dir / file.name
+
+    # Use aiofiles for file comparison (if needed, or keep as is if filecmp is fast)
+    if output_file.exists() and filecmp.cmp(file, output_file):
+        print(f"\nFile {file.name} already exists, skipping")
+        return
+
+    print(f"Frame number {i + 1} / {total_files}", end='\r', flush=True)
+
+    # Run image reading in executor (since PIL/numpy are not async)
+    image_array = await loop.run_in_executor(None, single, file, None, None, True)
+    np.clip(image_array - dark_img, 0, None, out=image_array)
+
+    # Dead pixel correction (CPU-bound)
+    image_array = await loop.run_in_executor(None, dead_pixel_correction, image_array, n_cam, offsets, VROI)
+
+    # Writing image (CPU-bound)
+    await loop.run_in_executor(None, array_to_tif, image_array, target_dir, file.name)
+
+
 def load_darks(config):
     dirs = config['dark']
     darkframes = range(
@@ -326,6 +347,15 @@ def pick_dark(source_dir, darks):
     return dark_img
 
 
+async def process_camera_files(camdir, n_cam, VROI, output_directory, total_files, offsets, dark_img, copy_raw, raw_output_dir, loop):
+    tasks = []
+    for j, file in enumerate(camdir.glob("img_*.tif")):
+        tasks.append(process_file_async(j, file, n_cam, VROI, output_directory, total_files, offsets, dark_img, loop))
+        if copy_raw:
+            os.system(f'robocopy "{camdir}" "{raw_output_dir}" "{file.name}"  /njh /njs /ndl /nc /ns')
+    await asyncio.gather(*tasks)
+
+
 def main(root_source_dir, root_target_dir):
     # initial processing of raw data (dead pixel correction, rotate, flip, contrast)
     with open('e:/Rik/dead_pixel_multisource_Rik and Jule.yaml') as dp_file:
@@ -356,6 +386,8 @@ def main(root_source_dir, root_target_dir):
         if copy_raw:
             raw_dir = target_dir.parent / '01_raw' / source_dir.name
             raw_dir.mkdir(parents=True, exist_ok=True)
+        else:
+            raw_dir = None
 
         # gather settings from "setting  data.txt"
         xray_settings = read_detector_settings(source_dir)
@@ -383,6 +415,8 @@ def main(root_source_dir, root_target_dir):
             if copy_raw:
                 raw_output_dir = raw_dir / f"camera {n_cam}"
                 raw_output_dir.mkdir(parents=True, exist_ok=True)
+            else:
+                raw_output_dir = None
 
             # Copy "timestamp data.txt" files for camera folder
             os.system(f'robocopy "{camdir}" "{output_directory}" "timestamp data.txt"  /njh /njs /ndl /nc /ns')
@@ -390,10 +424,12 @@ def main(root_source_dir, root_target_dir):
                 os.system(f'robocopy "{camdir}" "{raw_output_dir}" "timestamp data.txt"  /njh /njs /ndl /nc /ns')
 
             print(f"Processing files in {camdir}")
-            for j, file in enumerate(camdir.glob("img_*.tif")):
-                process_file(j, file, n_cam, VROI, output_directory, total_files, offsets, dark_img)
-                if copy_raw:
-                    os.system(f'robocopy "{camdir}" "{raw_output_dir}" "{file.name}"  /njh /njs /ndl /nc /ns')
+            loop = asyncio.get_event_loop()
+            loop.run_until_complete(
+                process_camera_files(camdir, n_cam, VROI, output_directory,
+                                     total_files, offsets, dark_img, copy_raw,
+                                     raw_output_dir, loop)
+            )
             print('')
 
 

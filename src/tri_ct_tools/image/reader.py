@@ -12,6 +12,7 @@ def print_reading(file, quiet):
     print(f"Reading {file}")
 
 
+# [ ] Create async single
 def single(img_file=None, img_folder=None, frame=None, quiet=False):
     """Load and return a single image
 

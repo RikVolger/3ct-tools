@@ -168,6 +168,7 @@ def dead_pixel_correction(image, cam_no, offsets, VROI=[0, 1523]):
     # Correct hline position for VROI settings
     hline = 763 - start_line
 
+    # [ ] For async, take this out of here. Maybe just always take this out of here.
     with open('src/tri_ct_tools/preprocess/dead_pixel_lines.yaml') as dpl_file:
         dpl = yaml.safe_load(dpl_file)
 

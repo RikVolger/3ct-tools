@@ -26,6 +26,7 @@ def fig_svg(fig: Figure, output_folder: Path, filename: str):
     return save_file
 
 
+# [ ] Create async tiff writer
 def array_to_tif(img: np.ndarray, output_folder: Path, filename: str):
     output_folder.mkdir(parents=True, exist_ok=True)
     output_file = output_folder / filename

@@ -237,14 +237,18 @@ async def process_file_async(i, file: Path, n_cam, VROI, target_dir, total_files
         print(f"\nFile {file.name} already exists, skipping")
         return
 
-    print(f"Frame number {i + 1} / {total_files}", end='\r', flush=True)
+    print(f"Reading frame number {i + 1} / {total_files}     ", end='\r', flush=True)
 
     # Run image reading in executor (since PIL/numpy are not async)
     image_array = await loop.run_in_executor(None, single, file, None, None, True)
     np.clip(image_array - dark_img, 0, None, out=image_array)
 
+    print(f"Correcting frame number {i + 1} / {total_files}", end='\r', flush=True)
+
     # Dead pixel correction (CPU-bound)
     image_array = await loop.run_in_executor(None, dead_pixel_correction, image_array, n_cam, offsets, VROI)
+
+    print(f"Writing frame number {i + 1} / {total_files}     ", end='\r', flush=True)
 
     # Writing image (CPU-bound)
     await loop.run_in_executor(None, array_to_tif, image_array, target_dir, file.name)
@@ -347,8 +351,9 @@ def pick_dark(source_dir, darks):
     return dark_img
 
 
-async def process_camera_files(camdir, n_cam, VROI, output_directory, total_files, offsets, dark_img, copy_raw, raw_output_dir, loop):
+async def process_camera_files(camdir, n_cam, VROI, output_directory, total_files, offsets, dark_img, copy_raw, raw_output_dir):
     tasks = []
+    loop = asyncio.get_running_loop()
     for j, file in enumerate(camdir.glob("img_*.tif")):
         tasks.append(process_file_async(j, file, n_cam, VROI, output_directory, total_files, offsets, dark_img, loop))
         if copy_raw:
@@ -424,11 +429,11 @@ def main(root_source_dir, root_target_dir):
                 os.system(f'robocopy "{camdir}" "{raw_output_dir}" "timestamp data.txt"  /njh /njs /ndl /nc /ns')
 
             print(f"Processing files in {camdir}")
-            loop = asyncio.get_event_loop()
-            loop.run_until_complete(
+            # loop = asyncio.get_event_loop()
+            asyncio.run(
                 process_camera_files(camdir, n_cam, VROI, output_directory,
                                      total_files, offsets, dark_img, copy_raw,
-                                     raw_output_dir, loop)
+                                     raw_output_dir)
             )
             print('')
 

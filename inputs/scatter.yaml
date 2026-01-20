@@ -1,13 +1,13 @@
 # folders containing the folders with measurement and scatter
 roots:
-# - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-13 Rik Cropper\02_preprocessed
-# - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-18 Rik\02_preprocessed
-# - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-19 Rik\02_preprocessed
-# - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-25 Rik\02_preprocessed
-# - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed
-# - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\02_preprocessed
-- U:\Xray RPT ChemE\X-ray\Xray_data\2025-07-07 Rik\02_preprocessed    # Mind: 300x1500 crop
-- U:\Xray RPT ChemE\X-ray\Xray_data\2025-07-09 Rik\02_preprocessed    # Mind: 300x1500 crop
+# - D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-13 Rik Cropper\02_preprocessed
+# - D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-18 Rik\02_preprocessed
+# - D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-19 Rik\02_preprocessed
+# - D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-25 Rik\02_preprocessed
+# - D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\02_preprocessed
+# - D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\02_preprocessed
+- D:\XRay\XRay Summer 2025 - Rik Croppers\2025-07-07 Rik\02_preprocessed    # Mind: 300x1500 crop
+- D:\XRay\XRay Summer 2025 - Rik Croppers\2025-07-09 Rik\02_preprocessed    # Mind: 300x1500 crop
 cameras:
 - 1
 - 2

@@ -1,4 +1,4 @@
-geom_path: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\00_calib\bhc_optimized_geom.npy
+geom_path: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\00_calib\bhc_optimized_geom.npy
 det:
   rows: 1524              # Number of rows in the detector
   cols: 1548              # Number of columns in the detector
@@ -31,102 +31,138 @@ ROI: [450, 1100]    # For full crop
 cameras: [0, 1, 2]
 series:
   - name: 1500x1500Crop 120kV SC (2025-06-26)
-    full: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Full_120kV_22Hz
-    empty: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Empty_120kV_22Hz
-    empty_copy: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_Empty_120kV_22Hz
+    full: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Full_120kV_22Hz
+    empty: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Empty_120kV_22Hz
+    empty_copy: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_Empty_120kV_22Hz
     meas:
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_30lmin_120kV_22Hz
-        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_30lmin_120kV_22Hz
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_80lmin_120kV_22Hz
-        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_80lmin_120kV_22Hz
-      - input: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Full_120kV_22Hz
-        output: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_Full_120kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_30lmin_120kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_30lmin_120kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_80lmin_120kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_80lmin_120kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Full_120kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_Full_120kV_22Hz
   - name: 1500x1500Crop 120kV SC (2025-06-27)
-    full: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_Full_120kV_22Hz
-    empty: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_Empty_120kV_22Hz
-    empty_copy: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_Empty_120kV_22Hz
+    full: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_Full_120kV_22Hz
+    empty: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_Empty_120kV_22Hz
+    empty_copy: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_Empty_120kV_22Hz
     meas:
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_100lmin_120kV_22Hz    
-        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_100lmin_120kV_22Hz
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_150lmin_120kV_22Hz
-        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_150lmin_120kV_22Hz
-      - input: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_Full_120kV_22Hz
-        output: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_Full_120kV_22Hz
-  - name: 1500x1500Crop 135kV SC
-    full: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Full_135kV_22Hz
-    empty: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Empty_135kV_22Hz
-    empty_copy: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_Empty_135kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_100lmin_120kV_22Hz    
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_100lmin_120kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_150lmin_120kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_150lmin_120kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_Full_120kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_Full_120kV_22Hz
+  - name: 1500x1500Crop 135kV SC (2025-06-26)
+    full: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Full_135kV_22Hz
+    empty: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Empty_135kV_22Hz
+    empty_copy: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_Empty_135kV_22Hz
     meas:
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_30lmin_135kV_22Hz
-        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_30lmin_135kV_22Hz
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_80lmin_135kV_22Hz
-        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_80lmin_135kV_22Hz
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_100lmin_135kV_22Hz    
-        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_100lmin_135kV_22Hz
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_150lmin_135kV_22Hz
-        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_150lmin_135kV_22Hz
-      - input: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Full_135kV_22Hz
-        output: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_Full_135kV_22Hz
-  - name: 1500x1500Crop 150kV SC
-    full: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Full_150kV_22Hz
-    empty: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Empty_150kV_22Hz
-    empty_copy: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_Empty_150kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_30lmin_135kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_30lmin_135kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_80lmin_135kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_80lmin_135kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_100lmin_135kV_22Hz    
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_100lmin_135kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_150lmin_135kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_150lmin_135kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Full_135kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_Full_135kV_22Hz
+  - name: 1500x1500Crop 135kV SC (2025-06-27)
+    full: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_Full_135kV_22Hz
+    empty: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_Empty_135kV_22Hz
+    empty_copy: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_Empty_135kV_22Hz
     meas:
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_30lmin_150kV_22Hz
-        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_30lmin_150kV_22Hz
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_80lmin_150kV_22Hz
-        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_80lmin_150kV_22Hz
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_100lmin_150kV_22Hz    
-        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_100lmin_150kV_22Hz
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_150lmin_150kV_22Hz
-        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_150lmin_150kV_22Hz
-      - input: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Full_150kV_22Hz
-        output: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_Full_150kV_22Hz
-  - name: 1500x1500Crop 120kV non-SC
-    full: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed\1500x1500Crop_Full_120kV_22Hz
-    empty: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed\1500x1500Crop_Empty_120kV_22Hz
-    dark: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed\Dark_22Hz
-    empty_copy: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_Empty_120kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_100lmin_135kV_22Hz    
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_100lmin_135kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_150lmin_135kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_150lmin_135kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_Full_135kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_Full_135kV_22Hz
+  - name: 1500x1500Crop 150kV SC (2025-06-26)
+    full: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Full_150kV_22Hz
+    empty: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Empty_150kV_22Hz
+    empty_copy: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_Empty_150kV_22Hz
     meas:
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed\1500x1500Crop_30lmin_120kV_22Hz
-        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_30lmin_120kV_22Hz
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed\1500x1500Crop_80lmin_120kV_22Hz
-        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_80lmin_120kV_22Hz
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\02_preprocessed\1500x1500Crop_100lmin_120kV_22Hz
-        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\04_pp_bhc\1500x1500Crop_100lmin_120kV_22Hz
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\02_preprocessed\1500x1500Crop_150lmin_120kV_22Hz
-        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\04_pp_bhc\1500x1500Crop_150lmin_120kV_22Hz
-      - input: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed\1500x1500Crop_Full_120kV_22Hz
-        output: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_Full_120kV_22Hz
-  - name: 1500x1500Crop 135kV non-SC
-    full: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed\1500x1500Crop_Full_135kV_22Hz
-    empty: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed\1500x1500Crop_Empty_135kV_22Hz
-    dark: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed\Dark_22Hz
-    empty_copy: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_Empty_135kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_30lmin_150kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_30lmin_150kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_80lmin_150kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_80lmin_150kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\03_scattercorrected\1500x1500Crop_Full_150kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\05_sc_bhc\1500x1500Crop_Full_150kV_22Hz
+  - name: 1500x1500Crop 150kV SC (2025-06-27)
+    full: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_Full_150kV_22Hz
+    empty: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_Empty_150kV_22Hz
+    empty_copy: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_Empty_150kV_22Hz
     meas:
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed\1500x1500Crop_30lmin_135kV_22Hz
-        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_30lmin_135kV_22Hz
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed\1500x1500Crop_80lmin_135kV_22Hz
-        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_80lmin_135kV_22Hz
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\02_preprocessed\1500x1500Crop_100lmin_135kV_22Hz
-        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\04_pp_bhc\1500x1500Crop_100lmin_135kV_22Hz
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\02_preprocessed\1500x1500Crop_150lmin_135kV_22Hz
-        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\04_pp_bhc\1500x1500Crop_150lmin_135kV_22Hz
-      - input: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed\1500x1500Crop_Full_135kV_22Hz
-        output: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_Full_135kV_22Hz
-  - name: 1500x1500Crop 150kV non-SC
-    full: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed\1500x1500Crop_Full_150kV_22Hz
-    empty: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed\1500x1500Crop_Empty_150kV_22Hz
-    dark: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed\Dark_22Hz
-    empty_copy: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_Empty_150kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_100lmin_150kV_22Hz    
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_100lmin_150kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_150lmin_150kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_150lmin_150kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_Full_150kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_Full_150kV_22Hz
+  - name: 1500x1500Crop 120kV non-SC (2025-06-26)
+    full: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\02_preprocessed\1500x1500Crop_Full_120kV_22Hz
+    empty: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\02_preprocessed\1500x1500Crop_Empty_120kV_22Hz
+    empty_copy: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_Empty_120kV_22Hz
     meas:
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed\1500x1500Crop_30lmin_150kV_22Hz
-        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_30lmin_150kV_22Hz
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed\1500x1500Crop_80lmin_150kV_22Hz
-        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_80lmin_150kV_22Hz
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\02_preprocessed\1500x1500Crop_100lmin_150kV_22Hz
-        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\04_pp_bhc\1500x1500Crop_100lmin_150kV_22Hz
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\02_preprocessed\1500x1500Crop_150lmin_150kV_22Hz
-        output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\04_pp_bhc\1500x1500Crop_150lmin_150kV_22Hz
-      - input: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed\1500x1500Crop_Full_150kV_22Hz
-        output: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_Full_150kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\02_preprocessed\1500x1500Crop_30lmin_120kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_30lmin_120kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\02_preprocessed\1500x1500Crop_80lmin_120kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_80lmin_120kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\02_preprocessed\1500x1500Crop_Full_120kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_Full_120kV_22Hz
+  - name: 1500x1500Crop 120kV non-SC (2025-06-27)
+    full: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\02_preprocessed\1500x1500Crop_Full_120kV_22Hz
+    empty: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\02_preprocessed\1500x1500Crop_Empty_120kV_22Hz
+    empty_copy: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\04_pp_bhc\1500x1500Crop_Empty_120kV_22Hz
+    meas:
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\02_preprocessed\1500x1500Crop_100lmin_120kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\04_pp_bhc\1500x1500Crop_100lmin_120kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\02_preprocessed\1500x1500Crop_150lmin_120kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\04_pp_bhc\1500x1500Crop_150lmin_120kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\02_preprocessed\1500x1500Crop_Full_120kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\04_pp_bhc\1500x1500Crop_Full_120kV_22Hz
+  - name: 1500x1500Crop 135kV non-SC (2025-06-26)
+    full: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\02_preprocessed\1500x1500Crop_Full_135kV_22Hz
+    empty: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\02_preprocessed\1500x1500Crop_Empty_135kV_22Hz
+    empty_copy: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_Empty_135kV_22Hz
+    meas:
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\02_preprocessed\1500x1500Crop_30lmin_135kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_30lmin_135kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\02_preprocessed\1500x1500Crop_80lmin_135kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_80lmin_135kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\02_preprocessed\1500x1500Crop_Full_135kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_Full_135kV_22Hz
+  - name: 1500x1500Crop 135kV non-SC (2025-06-27)
+    full: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\02_preprocessed\1500x1500Crop_Full_135kV_22Hz
+    empty: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\02_preprocessed\1500x1500Crop_Empty_135kV_22Hz
+    empty_copy: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\04_pp_bhc\1500x1500Crop_Empty_135kV_22Hz
+    meas:
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\02_preprocessed\1500x1500Crop_100lmin_135kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\04_pp_bhc\1500x1500Crop_100lmin_135kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\02_preprocessed\1500x1500Crop_150lmin_135kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\04_pp_bhc\1500x1500Crop_150lmin_135kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\02_preprocessed\1500x1500Crop_Full_135kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\04_pp_bhc\1500x1500Crop_Full_135kV_22Hz
+  - name: 1500x1500Crop 150kV non-SC (2025-06-26)
+    full: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\02_preprocessed\1500x1500Crop_Full_150kV_22Hz
+    empty: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\02_preprocessed\1500x1500Crop_Empty_150kV_22Hz
+    empty_copy: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_Empty_150kV_22Hz
+    meas:
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\02_preprocessed\1500x1500Crop_30lmin_150kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_30lmin_150kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\02_preprocessed\1500x1500Crop_80lmin_150kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_80lmin_150kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\02_preprocessed\1500x1500Crop_Full_150kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-26 Rik\04_pp_bhc\1500x1500Crop_Full_150kV_22Hz
+  - name: 1500x1500Crop 150kV non-SC (2025-06-27)
+    full: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\02_preprocessed\1500x1500Crop_Full_150kV_22Hz
+    empty: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\02_preprocessed\1500x1500Crop_Empty_150kV_22Hz
+    empty_copy: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\04_pp_bhc\1500x1500Crop_Empty_150kV_22Hz
+    meas:
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\02_preprocessed\1500x1500Crop_100lmin_150kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\04_pp_bhc\1500x1500Crop_100lmin_150kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\02_preprocessed\1500x1500Crop_150lmin_150kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\04_pp_bhc\1500x1500Crop_150lmin_150kV_22Hz
+      - input: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\02_preprocessed\1500x1500Crop_Full_150kV_22Hz
+        output: D:\XRay\XRay Summer 2025 - Rik Croppers\2025-06-27 Rik\04_pp_bhc\1500x1500Crop_Full_150kV_22Hz

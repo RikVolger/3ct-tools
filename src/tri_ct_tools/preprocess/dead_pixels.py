@@ -298,7 +298,9 @@ def pick_dark(source_dir, darks):
     source_settings = read_detector_settings(source_dir)
     cam_folders = list(source_dir.glob("camera*"))
     img_shape = single(cam_folders[0] / 'img_10.tif').shape
+
     (cam_mode, VROI, framerate, timestamp, cameras) = source_settings
+    
     same_shape = (darks['img_shape'] == img_shape).all(axis=1)
     same_framerate = darks['framerate'] == framerate
     full_shape = (darks['img_shape'] == (1524, 1548)).all(axis=1)
@@ -312,8 +314,6 @@ def pick_dark(source_dir, darks):
         # idx_date_based = np.argmin(abs(darks['timestamp'][same_shape & same_framerate] - timestamp))
         dark_img = darks['images'][idx_date_based]
     elif np.sum(same_framerate & full_shape) >= 1:
-        # [ ] Alternative situation that is not covered: there is no properly cropped
-        # dark available, but there is a bigger one with the same framerate
         # Find the shapes that are larger or equal to shape of source
         dark_img = darks['images'][np.argmax(full_shape & same_framerate)]
         # Crop to source image size

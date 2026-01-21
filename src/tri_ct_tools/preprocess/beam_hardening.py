@@ -22,7 +22,7 @@ def BHC(I_BH, I_empty, coefficients, mu_eff, offset):
     # use interpolation to determine ditance through liquid based on actual data
     x_fit_values = np.interp(lnII, P_x_values, x_values)
 
-    I_noBH = np.exp(-mu_eff * x_fit_values + offset) * I_empty
+    I_noBH = np.exp(-mu_eff * x_fit_values - offset) * I_empty
 
     # After beam hardening corrections, nan values can appear in image. Interpolate.
     if np.any(np.isnan(I_noBH)):
@@ -115,7 +115,7 @@ def log_line_plot(
     ax.plot(d[mask], rel_intensity_log, 'o', alpha=0.1, label='data')
     ax.plot(d[mask], rel_intensity_log_noBH, 'o', alpha=0.1, label='data-BHC')
     ax.plot(d_vals, p_fit, label='polyfit')
-    ax.plot(d_vals, d_vals*mu_eff, label='constant attenuation')
+    ax.plot(d_vals, d_vals*mu_eff + offset, label='constant attenuation')
     ax.set_title(
         f"Camera {cam+1}, {voltage} kV"
         R" - $\mu_{eff}$ = "
@@ -128,27 +128,26 @@ def log_line_plot(
 
 
 def beam_hardening_coefficients(d, img_full, img_empty):
-    
     # Take a horizontal slice to avoid probes screwing with the next steps
     # row_start = 300
     # row_end = 1100
     # d = d[row_start:row_end, :]
     # img_full = img_full[row_start:row_end, :]
     # img_empty = img_empty[row_start:row_end, :]
-    
+
     # Only consider values where the beam passed through the column
     d_mask = d > 0
     d = d[d_mask]
     img_full = img_full[d_mask]
     img_empty = img_empty[d_mask]
-    
+
     # Calculate relative intensity
     rel_intensity = img_full / img_empty
-    
+
     # Clean up to avoid problems in logarithm
     mask = rel_intensity > 0
     rel_intensity_log = -np.log(rel_intensity[mask])
-    
+
     # Fit polynomial to the data
     coeff, mu_eff, offset = calc_coef_mu(d[mask], rel_intensity_log,    5)
     return coeff, mu_eff, offset

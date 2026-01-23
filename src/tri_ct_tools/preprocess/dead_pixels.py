@@ -328,7 +328,7 @@ def pick_dark(source_dir, darks):
 
 def main(root_source_dir, root_target_dir):
     # initial processing of raw data (dead pixel correction, rotate, flip, contrast)
-    with open('e:/Rik/dead_pixel_multisource_Rik and Jule.yaml') as dp_file:
+    with open('D:\XRay\XRay Summer 2025 - Reanalysis\dead_pixel_reanalysis.yaml') as dp_file:
         config = yaml.safe_load(dp_file)
     if not root_source_dir:
         root_source_dir = config['input_folder']

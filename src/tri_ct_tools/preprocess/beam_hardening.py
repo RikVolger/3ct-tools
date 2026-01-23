@@ -167,7 +167,7 @@ def get_coefficients(det, ROI, geoms_all_cams, cam, img_full, img_empty):
 
 if __name__ == "__main__":
 
-    input_file = Path("inputs/beam_hardening_corrections.yaml")
+    input_file = Path("inputs/bhc_3angle_tomo.yaml")
     with open(input_file) as bhc_yaml:
         bhc_input = yaml.safe_load(bhc_yaml)
 

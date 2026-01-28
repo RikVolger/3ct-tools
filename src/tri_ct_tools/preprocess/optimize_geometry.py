@@ -158,7 +158,7 @@ def optimize_det(cameras, det, img_all_cams, row_start, row_end, geoms_ori_opt):
 
 
 def _opt_geom(geoms_all_cams, cameras, det, img_all_cams,
-              window_height=10, verbosity="figure"):
+              window_height=10):
     middle_line = det['rows'] // 2
     row_start = middle_line - (window_height // 2)
     row_end = middle_line + (window_height // 2)

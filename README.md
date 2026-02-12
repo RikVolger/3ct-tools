@@ -35,11 +35,14 @@ The main workhorse for quick image analysis is the Jupyter notebook.
 Unfortunately, Jupyter notebooks and git don't play nice together. 
 
 If you're going to run any of the notebooks and make git commits, make sure to run the 
-following command: 
+following command from the folder root: 
 
 ```bash
 pre-commit install
 ```
+You only have to run it once, then git knows what to do. If you ever delete the 
+`.git` folder you'll have to run it again. But in that case you likely have an 
+idea what you're doing.
 
 This registers the 'pre-hook' defined in `.pre-commit-config.yaml`, essentially 
 running `nbstripout` before each commit. `nbstripout` strips out all notebook 

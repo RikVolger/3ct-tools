@@ -46,9 +46,10 @@ running `nbstripout` before each commit. `nbstripout` strips out all notebook
 outputs, making it much easier for multiple people to work on the notebooks.
 
 Note: This is a thing that deletes outputs from notebooks when they are 
-committed with outputs. Sometimes, this means that when you press / enter a 
-commit command, it looks like it fails because this guy is doing things. Just 
-stage the file again, commit again and it will all be fine.
+committed (or technically right before that. You know, pre-commit). Sometimes, 
+this means that when you press / enter a commit command, it fails because this 
+guy needs to do its thing. No big deal, just stage the file again, commit again 
+and it will all be fine.
 
 **Do not commit notebooks without having ran this! That would make everyones** 
 **lives miserable.**

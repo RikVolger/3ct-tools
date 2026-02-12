@@ -181,7 +181,11 @@ def dead_pixel_correction(image, cam_no, offsets, VROI=[0, 1523]):
     return image
 
 
-def find_subdirectories(directory: Path, subdirectories=[]) -> list[Path]:
+def find_subdirectories(directory: Path, subdirectories=None) -> list[Path]:
+    
+    if subdirectories is None:
+        subdirectories = []
+
     for entry in directory.iterdir():
         if entry.is_dir():
             subdirectories.append(entry)

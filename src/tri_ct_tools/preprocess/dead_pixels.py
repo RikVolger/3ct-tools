@@ -236,7 +236,7 @@ def load_darks(config):
         config['darkframes']['stop'],
         config['darkframes']['step']
     )
-    # Shortcut for single dark provided.
+    # Shortcut for when a single dark image is provided.
     if isinstance(dirs, str):
         dark_path = Path(dirs)
         cam_folders = list(dark_path.glob("camera*"))
@@ -334,7 +334,12 @@ def main(root_source_dir, root_target_dir):
         root_source_dir = config['input_folder']
         root_target_dir = config['output_folder']
 
-    copy_raw = config['copy_raw']
+    copy_raw = bool(config['copy_raw'])
+    avg_only = bool(config['avg_only'])
+    if avg_only:
+        framestart = int(config['framestart'])
+    else:
+        framestart = None
     offsets = config['offsets']
     # VROI = get_VROI_setting()
 
@@ -362,9 +367,11 @@ def main(root_source_dir, root_target_dir):
         VROI = xray_settings[1]
 
         # Copy "settings  data.txt" files for camera folder
-        os.system(f'robocopy "{source_dir}" "{preprocessed_dir}" "settings  data.txt" /njh /njs /ndl /nc /ns')
+        os.system(f'robocopy "{source_dir}" "{preprocessed_dir}" '
+                  f'"settings  data.txt" /njh /njs /ndl /nc /ns')
         if copy_raw:
-            os.system(f'robocopy "{source_dir}" "{raw_dir}" "settings  data.txt" /njh /njs /ndl /nc /ns')
+            os.system(f'robocopy "{source_dir}" "{raw_dir}" '
+                      f'"settings  data.txt" /njh /njs /ndl /nc /ns')
 
         for i, n_cam in enumerate(range(1, 4)):
             dark_img = dark_images[i, :, :]
@@ -385,15 +392,37 @@ def main(root_source_dir, root_target_dir):
                 raw_output_dir.mkdir(parents=True, exist_ok=True)
 
             # Copy "timestamp data.txt" files for camera folder
-            os.system(f'robocopy "{camdir}" "{output_directory}" "timestamp data.txt"  /njh /njs /ndl /nc /ns')
+            os.system(f'robocopy "{camdir}" "{output_directory}" '
+                      f'"timestamp data.txt"  /njh /njs /ndl /nc /ns')
             if copy_raw:
-                os.system(f'robocopy "{camdir}" "{raw_output_dir}" "timestamp data.txt"  /njh /njs /ndl /nc /ns')
+                os.system(f'robocopy "{camdir}" "{raw_output_dir}" '
+                          f'"timestamp data.txt"  /njh /njs /ndl /nc /ns')
 
             print(f"Processing files in {camdir}")
-            for j, file in enumerate(camdir.glob("img_*.tif")):
-                process_file(j, file, n_cam, VROI, output_directory, total_files, offsets, dark_img)
-                if copy_raw:
-                    os.system(f'robocopy "{camdir}" "{raw_output_dir}" "{file.name}"  /njh /njs /ndl /nc /ns')
+            img_list = list(camdir.glob("img_*.tif"))
+            img_shape = single(img_list[0], quiet=True).shape
+            if avg_only:
+                # Determine framerange from number of 'img_*.tif' files.
+                n_frames = len(img_list)
+                framerange = range(framestart, n_frames)
+                # read mean of img files in the folder
+                img_array = singlecam_mean(camdir, framerange, img_shape,
+                                           dark=dark_img, quiet=True)
+                # apply dpc to mean img
+                img_array = dead_pixel_correction(img_array, n_cam, offsets,
+                                                  VROI)
+                # write that to target_dir / average.tif
+                array_to_tif(img_array, output_directory, 'average.tif')
+            else:
+                for j, file in enumerate(img_list):
+                    process_file(j, file, n_cam, VROI, output_directory,
+                                 total_files, offsets, dark_img)
+
+            if copy_raw:
+                print('Copying raw images...')
+                for j, file in enumerate(img_list):
+                    os.system(f'robocopy "{camdir}" "{raw_output_dir}" '
+                              f'"{file.name}"  /njh /njs /ndl /nc /ns')
             print('')
 
 

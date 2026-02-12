@@ -1,6 +1,10 @@
 input_folder: C:\Users\rikvolger\Codebase\3ct-tools\data\S
 output_folder: C:\Users\rikvolger\Codebase\3ct-tools\data\U\02_preprocessed
 copy_raw: True
+# avg_only allows to only save the average as preprocessed, saving storage
+avg_only: True
+# framestart is only used for making averages
+framestart: 50
 mirror: False
 offsets:
   1:

@@ -69,7 +69,8 @@ def singlecam_mean(cam_folder: Path, frames, img_shape, dark=None, quiet=False):
         # Save average for future use
         array_to_tif(img, cam_folder, 'average')
     if dark is not None:
-        img -= dark
+        # Subtract dark but make sure no value goes < 0
+        np.clip(img - dark, 0, None, out=img)
     return img
 
 

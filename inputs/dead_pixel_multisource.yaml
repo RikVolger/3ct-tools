@@ -28,6 +28,10 @@ darkframes:
   stop: 100
   step: 1
 copy_raw: False
+# avg_only allows to only save the average as preprocessed, saving storage
+avg_only: True
+# framestart is only used for making averages
+framestart: 50
 subtract_dark: True
 mirror: False
 offsets:

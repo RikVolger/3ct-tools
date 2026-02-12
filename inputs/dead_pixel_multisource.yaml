@@ -23,6 +23,7 @@ dark:
 - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-13 Rik Cropper\01_raw\WideCrop_Dark_22Hz
 - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\01_raw\Dark_22Hz
 - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\01_raw\Dark_110Hz
+# frames to load from dark measurements
 darkframes:
   start: 20
   stop: 100

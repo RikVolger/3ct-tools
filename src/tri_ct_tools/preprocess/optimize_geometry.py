@@ -243,9 +243,9 @@ def geometry_optimizer(
 
 if __name__ == "__main__":
     # path to geometry
-    geom_path = Path(R'U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-13 Rik Cropper'
-                     R'\calib\NeedleCalibration_5degps\geom.npy')
-    img_path_base = Path(R'u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik')
+    geom_path = Path(R'd:\XRT paper\XRay\2025-06-13\00_calib'
+                     R'\NeedleCalibration_5degps\geom.npy')
+    img_path_base = Path(R'd:\XRT paper\XRay\2025-06-26')
     full_img_path = '03_scattercorrected/1500x1500Crop_Full_120kV_22Hz'
     empty_img_path = '03_scattercorrected/1500x1500Crop_Empty_120kV_22Hz'
 

@@ -58,6 +58,11 @@ def scatter_correct(yaml_file="inputs/scatter.yaml"):
             # if one is missing an error. Log file should be marked with
             # datetimestamp.
             for i, sc_ID in enumerate(scatters):
+                # [ ] Update the way scatter names are looked for. Current way 
+                # is very inflexible. Perhaps just look for the scatter ID
+                # Double inflexible actually - should also create a method for 
+                # when single-source, multi-detector scatter measurements are 
+                # done. Those need addition of scatter values.
                 scatter_name = convert_name_to_scatter(exp_name, scatters[i])
                 if not Path(rf / scatter_name).exists():
                     n_missing += 1
@@ -103,4 +108,4 @@ def scatter_correct(yaml_file="inputs/scatter.yaml"):
 
 
 if __name__ == "__main__":
-    scatter_correct()
+    scatter_correct(R"D:\XRT paper\XRay\scatter.yaml")

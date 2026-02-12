@@ -8,7 +8,6 @@ import yaml
 from tri_ct_tools.convert.geometry import calc_distances, cate_to_astra, plot_full_geom
 from tri_ct_tools.image.reader import singlecam_mean
 from tri_ct_tools.image.writer import array_to_tif
-from tri_ct_tools.inspect.beam_hardening import single_cam_analysis
 
 
 def BHC(I_BH, I_empty, coefficients, mu_eff, offset):
@@ -167,7 +166,7 @@ def get_coefficients(det, ROI, geoms_all_cams, cam, img_full, img_empty):
 
 if __name__ == "__main__":
 
-    input_file = Path("inputs/bhc_3angle_tomo.yaml")
+    input_file = Path(R"D:\XRT paper\XRay\bhc_3angle_tomo.yaml")
     with open(input_file) as bhc_yaml:
         bhc_input = yaml.safe_load(bhc_yaml)
 
@@ -206,14 +205,15 @@ if __name__ == "__main__":
 
     for s in series:
         name = s['name']
-        full_path = Path(s['full'])
-        empty_path = Path(s['empty'])
+        root = Path(s['root'])
+        full_path = root / s['full']
+        empty_path = root / s['empty']
         if 'dark' in s.keys() and s['dark'] is not None:
-            dark_path = Path(s['dark'])
+            dark_path = root / s['dark']
         else:
             dark_path = None
             img_dark = None
-        empty_copy_path = Path(s['empty_copy'])
+        empty_copy_path = root / s['empty_copy']
 
         print(f"\nRunning beam hardening correction for {name}")
 
@@ -223,7 +223,7 @@ if __name__ == "__main__":
                 img_dark = singlecam_mean(dark_path_cam, framerange['dark'], img_shape)
             full_path_cam = full_path / f"camera {cam+1}"
             empty_path_cam = empty_path / f"camera {cam+1}"
-            meas_path_cam = Path(meas['input']) / f"camera {cam+1}"
+            meas_path_cam = root / meas['input'] / f"camera {cam+1}"
             img_full = singlecam_mean(full_path_cam, framerange['full'], img_shape, img_dark)
             img_empty = singlecam_mean(empty_path_cam, framerange['empty'], img_shape, img_dark)
             if "Full" in str(meas_path_cam):
@@ -235,7 +235,7 @@ if __name__ == "__main__":
 
             meas_bhc = BHC(img_meas, img_empty, coeff, mu_eff, offset)
 
-            meas_output_path = Path(meas['output'])
+            meas_output_path = root / meas['output']
             meas_output_cam = meas_output_path / f"camera {cam+1}"
             array_to_tif(meas_bhc.astype(np.int32), meas_output_cam, 'average.tif')
             bhc_coefficients = {

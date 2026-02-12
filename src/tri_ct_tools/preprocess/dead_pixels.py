@@ -210,6 +210,7 @@ def list_subdirectories(source_dir: str | list, target_dir: str | list) -> tuple
     source_dirs = []
     target_dirs = []
     for sdir, tdir in zip(source_dir, target_dir):
+        subdirs = []
         subdirs = find_subdirectories(Path(sdir))
         source_dirs += subdirs
         target_dirs += [Path(tdir)] * len(subdirs)
@@ -332,7 +333,7 @@ def pick_dark(source_dir, darks):
 
 def main(root_source_dir, root_target_dir):
     # initial processing of raw data (dead pixel correction, rotate, flip, contrast)
-    with open('D:\XRay\XRay Summer 2025 - Reanalysis\dead_pixel_reanalysis.yaml') as dp_file:
+    with open(R'D:\XRT paper\XRay\dead_pixel_correction.yaml') as dp_file:
         config = yaml.safe_load(dp_file)
     if not root_source_dir:
         root_source_dir = config['input_folder']

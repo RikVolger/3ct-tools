@@ -10,7 +10,7 @@ dependencies:
   - python
   - pillow
   - tifffile
-  - jupyter
+  - conda-forge::jupyter
   - ipympl
   - pip
   - pip:

@@ -3,6 +3,7 @@ channels:
   - defaults
 dependencies:
   - pyyaml
+  - conda-forge::conda-build
   - pandas
   - matplotlib
   - numpy

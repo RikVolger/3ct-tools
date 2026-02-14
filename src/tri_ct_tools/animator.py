@@ -30,8 +30,8 @@ def create_animation(
         image_series (np.ndarray): 4D array of shape (n_frames, n_cameras, height, width).
         filename (str | None, optional): Name of the output file. If None, a name is
             generated using fcounter and other parameters. Defaults to None.
-        colormap (cmap | str | None): Colormap or name of the colormap to use. 
-            Name should be one of the colormaps in mpl.colormaps. Defaults to 
+        colormap (cmap | str | None): Colormap or name of the colormap to use.
+            Name should be one of the colormaps in mpl.colormaps. Defaults to
             None, leading to tri_ct_tools.colors.blues9_map being used.
         frame_start (int, optional): Frame number offset for time display. Defaults to 0.
         framerate (int, optional): Framerate of the animation in frames per second.

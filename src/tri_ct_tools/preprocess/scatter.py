@@ -68,6 +68,10 @@ def scatter_correct(yaml_file="inputs/scatter.yaml"):
         raise ValueError("Scatter correction for time-resolved images is"
                          "currently undefined. Expect errors.")
     scatters = settings['scatter_IDs']
+    # [ ] Scatters can be measured single-source or double-source. In the first
+    # case, two scatter measurements need to be combined to obtain the camera-
+    # specific scatter signal. In the first case, it comes from a single
+    # measurement.
 
     # Correct for scatter
     # loop through the subdirectories in each root_folder
@@ -82,7 +86,7 @@ def scatter_correct(yaml_file="inputs/scatter.yaml"):
                 continue
             exp_name = subdir.name
 
-            if 'Scatter' in exp_name or 'scatter' in exp_name:
+            if 'scatter' in exp_name.lower():
                 continue
 
             n_missing = 0
@@ -120,7 +124,7 @@ def scatter_correct(yaml_file="inputs/scatter.yaml"):
             scatter_images = np.zeros_like(images)
             for i, sc_ID in enumerate(scatters):
                 # Stick the right scatter identifier inbetween second-to-last and last
-                scatter_name = convert_name_to_scatter(exp_name, scatters[i])
+                scatter_name = convert_name_to_scatter(exp_name, sc_ID)
                 scatter_dir = Path(rf / scatter_name)
                 if not scatter_dir.exists():
                     warnings.warn(f"Could not find {scatter_dir.absolute()}.",
@@ -128,6 +132,8 @@ def scatter_correct(yaml_file="inputs/scatter.yaml"):
                     continue
 
                 cam_folder = scatter_dir / f"camera {i+1}"
+                # [ ] In the case of single source scatter, load this for each
+                # source and add up. 
                 img = singlecam_mean(cam_folder, frames, img_shape).astype(np.int16)
                 scatter_images[i, ...] = img
 

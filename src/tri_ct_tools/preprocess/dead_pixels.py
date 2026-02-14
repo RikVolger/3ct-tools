@@ -4,7 +4,6 @@ import filecmp
 import yaml
 import numpy as np
 from datetime import datetime
-from PIL import Image
 from pathlib import Path
 
 from tri_ct_tools.image.reader import single, singlecam_mean
@@ -12,6 +11,14 @@ from tri_ct_tools.image.writer import array_to_tif
 
 
 def read_detector_settings(source_dir: Path):
+    """Read detector settings from a settings data file.
+
+    Args:
+        source_dir (Path): Path to the directory containing the settings data file.
+
+    Returns:
+        tuple: A tuple containing (cam_mode, VROI, framerate, timestamp, cameras).
+    """
     filename = source_dir / "settings  data.txt"
 
     cam_mode = ''
@@ -52,8 +59,19 @@ def read_detector_settings(source_dir: Path):
 
 
 def vertical_interpolation(image, x, y):
-    # dead pixel correction through vertical interpolation
-    # interpolate between neighbours, round to nearest integer
+    """Correct a dead pixel through vertical interpolation.
+
+    Interpolates the pixel value between vertical neighbours and rounds to the
+    nearest integer.
+
+    Args:
+        image (np.ndarray): 2D image array.
+        x (int): X coordinate of the dead pixel.
+        y (int): Y coordinate of the dead pixel.
+
+    Returns:
+        np.ndarray: Image with corrected pixel.
+    """
 
     image[y, x] = np.round((image[y - 1, x] + image[y + 1, x]) / 2)
 
@@ -61,16 +79,40 @@ def vertical_interpolation(image, x, y):
 
 
 def vertical_interpolation_vec(image, x_min, x_max, y):
-    # dead pixel correction through vertical interpolation
-    # interpolate between neighbours, round to nearest integer
+    """Correct multiple dead pixels through vertical interpolation.
+
+    Vectorized version that interpolates multiple pixel values between vertical
+    neighbours and rounds to the nearest integer.
+
+    Args:
+        image (np.ndarray): 2D image array.
+        x_min (int): Minimum X coordinate.
+        x_max (int): Maximum X coordinate.
+        y (int): Y coordinate of the dead pixels.
+
+    Returns:
+        np.ndarray: Corrected pixel values.
+    """
 
     x_range = slice(x_min, x_max+1)
     return np.round((image[y - 1, x_range] + image[y + 1, x_range]) / 2)
 
 
 def double_horizontal_interpolation(image, x1, x2, y):
-    # dead pixel correction through horizontal interpolation (case of 2 dead lines)
-    # interpolate between neighbours, round to nearest integer
+    """Correct two adjacent dead pixels through horizontal interpolation.
+
+    Interpolates the pixel values between horizontal neighbours and rounds to the
+    nearest integer. Both dead pixels are assigned the same interpolated value.
+
+    Args:
+        image (np.ndarray): 2D image array.
+        x1 (int): X coordinate of the first dead pixel.
+        x2 (int): X coordinate of the second dead pixel.
+        y (int): Y coordinate of the dead pixels.
+
+    Returns:
+        np.ndarray: Image with corrected pixels.
+    """
 
     image[y, x1] = np.round((image[y, x1 - 1] + image[y, x2 + 1]) / 2)
     image[y, x2] = image[y, x1]
@@ -78,8 +120,20 @@ def double_horizontal_interpolation(image, x1, x2, y):
 
 
 def double_horizontal_interpolation_vec(image, x1, x2):
-    # dead pixel correction through horizontal interpolation (case of 2 dead lines)
-    # interpolate between neighbours, round to nearest integer
+    """Correct multiple pairs of dead pixels through horizontal interpolation.
+
+    Vectorized version that interpolates multiple pixel values between horizontal
+    neighbours and rounds to the nearest integer. All dead pixels in the range
+    are assigned the same interpolated values.
+
+    Args:
+        image (np.ndarray): 2D image array.
+        x1 (int): X coordinate of the first dead pixel column.
+        x2 (int): X coordinate of the second dead pixel column.
+
+    Returns:
+        np.ndarray: Corrected pixel values.
+    """
 
     n_tiles = abs(x1-x2) + 1
     interpolated_values = np.round((image[:, x1 - 1] + image[:, x2 + 1]) / 2)
@@ -87,8 +141,19 @@ def double_horizontal_interpolation_vec(image, x1, x2):
 
 
 def horizontal_interpolation(image, x, y):
-    # dead pixel correction through horizontal interpolation
-    # interpolate between neighbours, round to nearest integer
+    """Correct a dead pixel through horizontal interpolation.
+
+    Interpolates the pixel value between horizontal neighbours and rounds to the
+    nearest integer.
+
+    Args:
+        image (np.ndarray): 2D image array.
+        x (int): X coordinate of the dead pixel.
+        y (int): Y coordinate of the dead pixel.
+
+    Returns:
+        np.ndarray: Image with corrected pixel.
+    """
 
     image[y, x] = round((image[y, x - 1] + image[y, x + 1]) / 2)
 
@@ -96,14 +161,42 @@ def horizontal_interpolation(image, x, y):
 
 
 def horizontal_interpolation_vec(image, x, y_min, y_max):
-    # dead pixel correction through horizontal interpolation
-    # interpolate between neighbours, round to nearest integer
+    """Correct multiple dead pixels through horizontal interpolation.
+
+    Vectorized version that interpolates multiple pixel values between horizontal
+    neighbours and rounds to the nearest integer.
+
+    Args:
+        image (np.ndarray): 2D image array.
+        x (int): X coordinate of the dead pixels.
+        y_min (int): Minimum Y coordinate.
+        y_max (int): Maximum Y coordinate.
+
+    Returns:
+        np.ndarray: Corrected pixel values.
+    """
 
     y_range = slice(y_min, y_max+1)
     return np.round((image[y_range, x - 1] + image[y_range, x + 1]) / 2)
 
 
 def correct_lines(image, VROI, hline, vert_tophalf, vert_bothalf, double_vert):
+    """Correct all dead pixel lines in an image using interpolation.
+
+    Applies vertical and horizontal interpolation to correct dead pixels at
+    specified locations.
+
+    Args:
+        image (np.ndarray): 2D image array with dead pixels.
+        VROI (list): Vertical region of interest [start, stop].
+        hline (int): Horizontal line position.
+        vert_tophalf (list): Vertical dead pixel positions in top half.
+        vert_bothalf (list): Vertical dead pixel positions in bottom half.
+        double_vert (list): Positions of double vertical dead pixels.
+
+    Returns:
+        np.ndarray: Image with corrected dead pixel lines.
+    """
     y_max = image.shape[0]
     x_max = image.shape[1]
 
@@ -182,7 +275,15 @@ def dead_pixel_correction(image, cam_no, offsets, VROI=[0, 1523]):
 
 
 def find_subdirectories(directory: Path, subdirectories=None) -> list[Path]:
-    
+    """Find all subdirectories in a given directory.
+
+    Args:
+        directory (Path): Path to the directory to search.
+        subdirectories (list, optional): List to accumulate results. Defaults to None.
+
+    Returns:
+        list[Path]: List of paths to all subdirectories found.
+    """
     if subdirectories is None:
         subdirectories = []
 
@@ -194,6 +295,22 @@ def find_subdirectories(directory: Path, subdirectories=None) -> list[Path]:
 
 
 def list_subdirectories(source_dir: str | list, target_dir: str | list) -> tuple[list, list]:
+    """Map source directories to target directories for batch processing.
+
+    Handles both single directory pairs and multiple source/target directory pairs.
+    Finds subdirectories for each source directory and maps them to corresponding
+    target directories.
+
+    Args:
+        source_dir (str | list): Source directory path or list of paths.
+        target_dir (str | list): Target directory path or list of paths.
+
+    Returns:
+        tuple[list, list]: Lists of source directories and their corresponding target directories.
+
+    Raises:
+        ValueError: If source_dir and target_dir types don't match (should be both str or both list).
+    """
     if isinstance(source_dir, str) and isinstance(target_dir, str):
         # Simple case: find subdirectories and return a list of those, with same
         # target dir for each
@@ -219,6 +336,22 @@ def list_subdirectories(source_dir: str | list, target_dir: str | list) -> tuple
 
 
 def process_file(i, file: Path, n_cam, VROI, target_dir, total_files, offsets, dark_img):
+    """Process a single image file: apply dark correction and dead pixel correction.
+
+    Loads an image, applies dark frame subtraction and dead pixel correction, then
+    saves the corrected image. Skips processing if the output file already exists
+    and is identical.
+
+    Args:
+        i (int): Frame index for progress display.
+        file (Path): Path to the image file to process.
+        n_cam (int): Camera number.
+        VROI (list): Vertical region of interest.
+        target_dir (Path): Directory to save processed image.
+        total_files (int): Total number of files for progress display.
+        offsets (dict): Dead pixel offset corrections for this camera.
+        dark_img (np.ndarray): Dark frame image for subtraction.
+    """
     output_file = target_dir / file.name
 
     if output_file.exists() and filecmp.cmp(file, output_file):
@@ -235,6 +368,21 @@ def process_file(i, file: Path, n_cam, VROI, target_dir, total_files, offsets, d
 
 
 def load_darks(config):
+    """Load dark frame images from configuration.
+
+    Loads dark frames from one or more directories specified in the config.
+    Handles both single directory (returns simple array) and multiple directories
+    (returns dictionary with metadata).
+
+    Args:
+        config (dict): Configuration dictionary with 'dark' and 'darkframes' keys.
+
+    Returns:
+        np.ndarray | dict: For single dark directory, returns dark frame array.
+                          For multiple directories, returns dict with keys:
+                          'crop', 'startline', 'stopline', 'img_shape', 'framerate',
+                          'timestamp', 'cameras', 'images'.
+    """
     dirs = config['dark']
     darkframes = range(
         config['darkframes']['start'],
@@ -298,6 +446,23 @@ def load_darks(config):
 
 
 def pick_dark(source_dir, darks):
+    """Select the most appropriate dark frame for a given source directory.
+
+    Matches dark frames based on image shape, framerate, and timestamp proximity.
+    If an exact match is found, returns it. If multiple matches exist, picks the
+    one closest in time. If no exact match but a full-size dark exists, crops it
+    to match the source image size.
+
+    Args:
+        source_dir (Path): Source directory with experiment data.
+        darks (np.ndarray | dict): Dark frame data or dictionary of dark frame metadata.
+
+    Returns:
+        np.ndarray: Selected dark frame(s) for the source directory.
+
+    Raises:
+        LookupError: If no suitable dark frame is found.
+    """
     if isinstance(darks, np.ndarray):
         return darks
     source_settings = read_detector_settings(source_dir)
@@ -305,7 +470,7 @@ def pick_dark(source_dir, darks):
     img_shape = single(cam_folders[0] / 'img_10.tif').shape
 
     (cam_mode, VROI, framerate, timestamp, cameras) = source_settings
-    
+
     same_shape = (darks['img_shape'] == img_shape).all(axis=1)
     same_framerate = darks['framerate'] == framerate
     full_shape = (darks['img_shape'] == (1524, 1548)).all(axis=1)
@@ -332,6 +497,16 @@ def pick_dark(source_dir, darks):
 
 
 def main(root_source_dir, root_target_dir):
+    """Main processing pipeline for dead pixel correction of X-ray images.
+
+    Processes raw X-ray detector data by applying dark frame subtraction and
+    dead pixel correction. Supports optional raw file copying and averaging modes.
+    Processes all camera folders recursively from source directories.
+
+    Args:
+        root_source_dir (Path | bool): Root source directory or False to use config.
+        root_target_dir (Path | bool): Root target directory or False to use config.
+    """
     # initial processing of raw data (dead pixel correction, rotate, flip, contrast)
     with open(R'D:\XRT paper\XRay\dead_pixel_correction.yaml') as dp_file:
         config = yaml.safe_load(dp_file)

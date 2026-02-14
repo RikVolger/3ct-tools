@@ -1,4 +1,4 @@
-# Beam hardening corrections for the data underlying the practical tomography 
+# Beam hardening corrections for the data underlying the practical tomography
 # for bubble columns paper. Only corrects 1500x1500 crop data of this series.
 geom_path: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\00_calib\bhc_optimized_geom.npy
 det:
@@ -49,7 +49,7 @@ series:
     empty: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_Empty_120kV_22Hz
     empty_copy: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_Empty_120kV_22Hz
     meas:
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_100lmin_120kV_22Hz    
+      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_100lmin_120kV_22Hz  
         output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_100lmin_120kV_22Hz
       - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_150lmin_120kV_22Hz
         output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_150lmin_120kV_22Hz
@@ -71,7 +71,7 @@ series:
     empty: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_Empty_135kV_22Hz
     empty_copy: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_Empty_135kV_22Hz
     meas:
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_100lmin_135kV_22Hz    
+      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_100lmin_135kV_22Hz
         output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_100lmin_135kV_22Hz
       - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_150lmin_135kV_22Hz
         output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_150lmin_135kV_22Hz
@@ -93,7 +93,7 @@ series:
     empty: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_Empty_150kV_22Hz
     empty_copy: U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_Empty_150kV_22Hz
     meas:
-      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_100lmin_150kV_22Hz    
+      - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_100lmin_150kV_22Hz
         output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_100lmin_150kV_22Hz
       - input: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\03_scattercorrected\1500x1500Crop_150lmin_150kV_22Hz
         output: u:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\05_sc_bhc\1500x1500Crop_150lmin_150kV_22Hz

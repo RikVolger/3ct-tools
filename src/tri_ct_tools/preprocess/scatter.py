@@ -8,6 +8,13 @@ from tri_ct_tools.image.writer import array_to_tif
 
 
 def write_images(img, folder: Path, cams):
+    """Write multi-camera image array to disk, one file per camera.
+
+    Args:
+        img (np.ndarray): 3D image array of shape (n_cameras, height, width).
+        folder (Path): Output folder where camera subdirectories will be created.
+        cams (list): List of camera numbers.
+    """
     for i, cam in enumerate(cams):
         cam_img = img[i, ...]
         imfolder = folder / f"camera {cam}"
@@ -15,12 +22,37 @@ def write_images(img, folder: Path, cams):
 
 
 def convert_name_to_scatter(exp_name, scatter_spec):
+    """Convert experiment name to corresponding scatter measurement name.
+
+    Inserts a scatter identifier into the experiment name for finding the
+    corresponding scatter reference measurement.
+
+    Args:
+        exp_name (str): Original experiment name.
+        scatter_spec (str): Scatter specification/identifier to insert.
+
+    Returns:
+        str: Modified experiment name with scatter specification.
+    """
     scatter_part = f"Scatter_{scatter_spec}"
     exp_name_parts = exp_name.split("_")
     return f"{'_'.join(exp_name_parts[:-1])}_{scatter_part}_{exp_name_parts[-1]}"
 
 
 def scatter_correct(yaml_file="inputs/scatter.yaml"):
+    """Perform scatter correction on multi-camera X-ray images.
+
+    Loads configuration from YAML file, processes all experiments in root folders,
+    finds matching scatter measurements, and subtracts scatter from images.
+    Saves corrected images to output folder.
+
+    Args:
+        yaml_file (str, optional): Path to scatter correction configuration file.
+            Defaults to "inputs/scatter.yaml".
+
+    Returns:
+        None: Saves corrected images to disk.
+    """
     # Load setup
     # Load calibration yaml with scatter scan properties
     with open(yaml_file) as scatter_yaml:
@@ -58,10 +90,10 @@ def scatter_correct(yaml_file="inputs/scatter.yaml"):
             # if one is missing an error. Log file should be marked with
             # datetimestamp.
             for i, sc_ID in enumerate(scatters):
-                # [ ] Update the way scatter names are looked for. Current way 
+                # [ ] Update the way scatter names are looked for. Current way
                 # is very inflexible. Perhaps just look for the scatter ID
-                # Double inflexible actually - should also create a method for 
-                # when single-source, multi-detector scatter measurements are 
+                # Double inflexible actually - should also create a method for
+                # when single-source, multi-detector scatter measurements are
                 # done. Those need addition of scatter values.
                 scatter_name = convert_name_to_scatter(exp_name, scatters[i])
                 if not Path(rf / scatter_name).exists():

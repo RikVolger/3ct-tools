@@ -1,4 +1,4 @@
-input_folder: 
+input_folder:
 # - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-12 Rik Cropper\01_raw
 # - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-13 Rik Cropper\01_raw
 # - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-19 Rik\01_raw
@@ -7,7 +7,7 @@ input_folder:
 - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\01_raw
 - U:\Xray RPT ChemE\X-ray\Xray_data\2025-07-07 Rik\01_raw
 - U:\Xray RPT ChemE\X-ray\Xray_data\2025-07-09 Rik\01_raw
-output_folder: 
+output_folder:
 # - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-12 Rik Cropper\02_preprocessed
 # - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-13 Rik Cropper\02_preprocessed
 # - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-19 Rik\02_preprocessed

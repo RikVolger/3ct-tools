@@ -5,6 +5,21 @@ from tri_ct_tools.convert.geometry import calc_distances
 
 
 def single_cam_analysis(geoms_all_cams, images, cam, det, rows=[720, 780]):
+    """Analyze beam hardening and attenuation for a single camera.
+
+    Performs analysis of detector images for a specified camera, including distance
+    calculations through the column, attenuation calculations, and visualization.
+
+    Args:
+        geoms_all_cams (list): List of geometry vectors for all cameras.
+        images (tuple): Tuple of (image_full, image_empty) reference images.
+        cam (int): Camera index to analyze.
+        det (dict): Detector configuration.
+        rows (list, optional): [row_start, row_end] range for analysis. Defaults to [720, 780].
+
+    Returns:
+        None: Generates plots and analysis output.
+    """
     d, _ = calc_distances(geoms_all_cams, cam, det)
 
     image_full, image_empty = images
@@ -53,6 +68,19 @@ def single_cam_analysis(geoms_all_cams, images, cam, det, rows=[720, 780]):
 
 
 def plot_outliers(image_full, points, no_column):
+    """Plot image with highlighted outlier pixels.
+
+    Creates a 2-panel figure showing the full image with red dots marking pixels
+    in a specified value range and blue dots marking pixels with zero distance.
+
+    Args:
+        image_full (np.ndarray): Image to display.
+        points (tuple): Tuple of (row_indices, col_indices) for outlier pixels.
+        no_column (np.ndarray): Boolean array marking pixels outside the column.
+
+    Returns:
+        matplotlib.figure.Figure: The created figure.
+    """
     fig, ax = plt.subplots(2, 1, sharex=True)
     ax[0].imshow(image_full)
 
@@ -67,6 +95,20 @@ def plot_outliers(image_full, points, no_column):
 
 
 def intensity_attenuation_plot(cam, d, ln_intensity, effective_attenuation):
+    """Plot intensity attenuation vs distance through liquid.
+
+    Creates a 2-panel figure showing the relationship between path length through
+    liquid and both the logarithmic intensity and the effective attenuation coefficient.
+
+    Args:
+        cam (int): Camera number for labeling.
+        d (np.ndarray): Distance through liquid (cm).
+        ln_intensity (np.ndarray): Logarithmic relative intensity (-ln(I/I_empty)).
+        effective_attenuation (np.ndarray): Effective attenuation coefficient (1/cm).
+
+    Returns:
+        matplotlib.figure.Figure: The created figure.
+    """
     mask = d > 0
     fig, ax = plt.subplots(1, 2, figsize=(15, 5), layout='tight')
     fig.suptitle(f"Detector {cam+1}, geom {cam+1}")

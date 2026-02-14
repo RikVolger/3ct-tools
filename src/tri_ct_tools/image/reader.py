@@ -7,6 +7,12 @@ from tri_ct_tools.image.writer import array_to_tif
 
 
 def print_reading(file, quiet):
+    """Print a message indicating that a file is being read.
+
+    Args:
+        file: File path being read.
+        quiet (bool): If True, suppress the message. If False, print it.
+    """
     if quiet:
         return
     print(f"Reading {file}")

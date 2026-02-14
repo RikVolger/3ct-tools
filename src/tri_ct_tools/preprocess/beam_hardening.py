@@ -11,6 +11,21 @@ from tri_ct_tools.image.writer import array_to_tif
 
 
 def BHC(I_BH, I_empty, coefficients, mu_eff, offset):
+    """Apply beam hardening correction to images.
+
+    Uses polynomial coefficients to correct for beam hardening effects by
+    interpolating distance through liquid and reconstructing corrected intensity.
+
+    Args:
+        I_BH (np.ndarray): Image with beam hardening effects.
+        I_empty (np.ndarray): Reference empty image (same shape as I_BH).
+        coefficients (np.ndarray): Polynomial coefficients from fitting.
+        mu_eff (float): Effective attenuation coefficient (1/cm).
+        offset (float): Offset value for linear attenuation model.
+
+    Returns:
+        np.ndarray: Beam hardening corrected image (same shape as input).
+    """
     # range of possible distances through liquid (for interpolation)
     x_values = np.linspace(0, 20, 1000)
     # y value to fit
@@ -46,7 +61,7 @@ def calc_coef_mu(d, ln_rel_intensity, mu_range=3, poly_degree=3):
         poly_degree (int, optional): Degree of the polynomial to fit. Defaults to 3.
 
     Returns:
-        Tuple[np.ndarray, float]: The coefficients of the fitted polynomial and 
+        Tuple[np.ndarray, float]: The coefficients of the fitted polynomial and
             the effective attenuation coefficient
     """
     coefficients = np.polyfit(d, ln_rel_intensity, poly_degree)
@@ -72,6 +87,24 @@ def log_line_plot(
         det,
         row_start=740,
         row_end=760):
+    """Create diagnostic plots for beam hardening analysis.
+
+    Generates plots showing attenuation vs distance for a horizontal slice of images,
+    before and after beam hardening correction.
+
+    Args:
+        path_full (Path): Path to full reference images.
+        path_empty (Path): Path to empty reference images.
+        voltage (str): Tube voltage in kV for plot title.
+        cam (int): Camera index.
+        geoms_all_cams (list): List of geometry vectors.
+        det (dict): Detector configuration.
+        row_start (int, optional): Start row for analysis slice. Defaults to 740.
+        row_end (int, optional): End row for analysis slice. Defaults to 760.
+
+    Returns:
+        matplotlib.figure.Figure: Diagnostic plot figure.
+    """
 
     img_full = singlecam_mean(path_full, framerange, img_shape)
     img_empty = singlecam_mean(path_empty, framerange, img_shape)
@@ -127,6 +160,21 @@ def log_line_plot(
 
 
 def beam_hardening_coefficients(d, img_full, img_empty):
+    """Calculate beam hardening correction coefficients.
+
+    Fits a polynomial to the attenuation data and calculates the effective
+    attenuation coefficient.
+
+    Args:
+        d (np.ndarray): Distance through liquid for each pixel (cm).
+        img_full (np.ndarray): Image with liquid-filled column.
+        img_empty (np.ndarray): Reference image with empty column.
+
+    Returns:
+        tuple: (coefficients, mu_eff, offset) where coefficients is the polynomial
+            coefficients array, mu_eff is the effective attenuation coefficient,
+            and offset is the linear offset term.
+    """
     # Take a horizontal slice to avoid probes screwing with the next steps
     # row_start = 300
     # row_end = 1100
@@ -153,6 +201,22 @@ def beam_hardening_coefficients(d, img_full, img_empty):
 
 
 def get_coefficients(det, ROI, geoms_all_cams, cam, img_full, img_empty):
+    """Get beam hardening coefficients for a camera with ROI cropping.
+
+    Calculates beam hardening correction coefficients for a specific camera,
+    applying region of interest cropping to exclude probes and other artifacts.
+
+    Args:
+        det (dict): Detector configuration.
+        ROI (list): [row_start, row_end] region of interest.
+        geoms_all_cams (list): List of geometry vectors for all cameras.
+        cam (int): Camera index.
+        img_full (np.ndarray): Image with liquid-filled column.
+        img_empty (np.ndarray): Reference image with empty column.
+
+    Returns:
+        tuple: (coefficients, mu_eff, offset) beam hardening coefficients.
+    """
     d, _ = calc_distances(geoms_all_cams, cam, det)
 
     # Crop out probes and tubes

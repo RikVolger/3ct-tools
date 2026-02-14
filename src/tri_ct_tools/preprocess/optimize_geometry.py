@@ -9,6 +9,23 @@ from tri_ct_tools.image.reader import singlecam_mean
 
 
 def opt_ori_fun(shift, geoms_all_cams, row_start, row_end, cameras, det, img_all_cams):
+    """Objective function for origin optimization.
+
+    Calculates the error metric for geometry optimization by summing squared
+    differences in sorted intensity values. Used as optimization target.
+
+    Args:
+        shift (list): [x_shift, y_shift, z_shift] coordinate shifts (cm).
+        geoms_all_cams (list): List of geometry vectors for all cameras.
+        row_start (int): Start row for analysis window.
+        row_end (int): End row for analysis window.
+        cameras (list): List of camera indices to include.
+        det (dict): Detector configuration.
+        img_all_cams (list): List of (img_full, img_empty) tuples for each camera.
+
+    Returns:
+        float: Error metric value (sum of squared differences).
+    """
     err = 0
     x_shift, y_shift, z_shift = shift
     rows = det['rows']
@@ -58,6 +75,22 @@ def opt_ori_fun(shift, geoms_all_cams, row_start, row_end, cameras, det, img_all
 
 
 def optimize_origin(geoms_all_cams, cameras, det, img_all_cams, row_start, row_end):
+    """Optimize X-ray source and detector center positions.
+
+    Performs optimization to find the best origin coordinates by minimizing
+    intensity fluctuations across distance ranges.
+
+    Args:
+        geoms_all_cams (list): Initial geometry vectors.
+        cameras (list): Camera indices to optimize.
+        det (dict): Detector configuration.
+        img_all_cams (list): Image data tuples for each camera.
+        row_start (int): Analysis window start row.
+        row_end (int): Analysis window end row.
+
+    Returns:
+        np.ndarray: Optimal shift [x, y, z] in cm.
+    """
     x_ori_0 = [-0.1, 0.1, 0]
     bounds = [(-.5, .5) for _ in range(len(x_ori_0))]
     print(f'initial error: {opt_ori_fun(x_ori_0, geoms_all_cams, row_start, row_end, cameras, det, img_all_cams)}')
@@ -83,6 +116,23 @@ def optimize_origin(geoms_all_cams, cameras, det, img_all_cams, row_start, row_e
 
 
 def opt_det_fun(shift, geoms_all_cams, row_start, row_end, cameras, det, img_all_cams):
+    """Objective function for detector optimization.
+
+    Calculates error metric for detector position optimization by summing
+    squared differences in sorted intensity values.
+
+    Args:
+        shift (list): Flattened array of per-camera shifts: [cam0_x, cam0_y, cam0_z, ...].
+        geoms_all_cams (list): List of geometry vectors.
+        row_start (int): Start row for analysis window.
+        row_end (int): End row for analysis window.
+        cameras (list): Camera indices to include.
+        det (dict): Detector configuration.
+        img_all_cams (list): Image data for each camera.
+
+    Returns:
+        float: Error metric value.
+    """
     err = 0
     camshifts = np.array(shift).reshape(3, 3)
     rows = det['rows']
@@ -130,6 +180,22 @@ def opt_det_fun(shift, geoms_all_cams, row_start, row_end, cameras, det, img_all
 
 
 def optimize_det(cameras, det, img_all_cams, row_start, row_end, geoms_ori_opt):
+    """Optimize detector positions for all cameras.
+
+    Performs optimization to find the best detector center coordinates by
+    minimizing intensity fluctuations.
+
+    Args:
+        cameras (list): Camera indices to optimize.
+        det (dict): Detector configuration.
+        img_all_cams (list): Image data for each camera.
+        row_start (int): Analysis window start row.
+        row_end (int): Analysis window end row.
+        geoms_ori_opt (list): Geometries after origin optimization.
+
+    Returns:
+        np.ndarray: Flattened array of optimal shifts for each camera.
+    """
     # Shift detectors 1: XYZ, 2: XYZ, 3: XYZ
     x_det_0 = [
         0, 0, 0,
@@ -159,6 +225,22 @@ def optimize_det(cameras, det, img_all_cams, row_start, row_end, geoms_ori_opt):
 
 def _opt_geom(geoms_all_cams, cameras, det, img_all_cams,
               window_height=10):
+    """Internal function to optimize complete geometry (origin and detectors).
+
+    Performs two-stage optimization: first for source/detector origin coordinates,
+    then for individual detector positions.
+
+    Args:
+        geoms_all_cams (list): Initial geometry vectors.
+        cameras (list): Camera indices to optimize.
+        det (dict): Detector configuration.
+        img_all_cams (list): Image data for each camera.
+        window_height (int, optional): Height of analysis window around detector center.
+            Defaults to 10.
+
+    Returns:
+        list: Optimized geometry vectors.
+    """
     middle_line = det['rows'] // 2
     row_start = middle_line - (window_height // 2)
     row_end = middle_line + (window_height // 2)
@@ -194,6 +276,24 @@ def geometry_optimizer(
         det,
         framerange=range(50, 200),
         cameras=range(0, 3)):
+    """Optimize and save multi-camera geometry calibration.
+
+    Loads initial geometry, optimizes camera and detector positions based on
+    reference images, and saves the optimized geometry with distance and
+    attenuation calculations.
+
+    Args:
+        geom_path (Path): Path to initial geometry file.
+        img_path_base (Path): Base path for image directories.
+        full_img_folder (str): Subfolder containing liquid-filled column images.
+        empty_img_folder (str): Subfolder containing empty column images.
+        det (dict): Detector configuration (rows, cols, pixel sizes, column diameter).
+        framerange (range, optional): Frame numbers to average. Defaults to range(50, 200).
+        cameras (range, optional): Camera indices to process. Defaults to range(0, 3).
+
+    Returns:
+        np.ndarray: Optimized geometry array saved to output.
+    """
 
     img_shape = (det['cols'], det['rows'])
     geoms_all_cams = cate_to_astra(path=geom_path, det=det)

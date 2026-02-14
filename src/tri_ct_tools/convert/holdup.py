@@ -9,6 +9,19 @@ _plot_kwargs = {
 
 
 def two_point_holdup(meas, full, empty):
+    """Calculate holdup fraction from measurement and reference images.
+
+    Computes the gas fraction in a two-phase system using the two-point method:
+    holdup = ln(meas/full) / ln(empty/full). Values are clipped to [0, 1].
+
+    Args:
+        meas (np.ndarray): Measurement image(s) with two-phase mixture.
+        full (np.ndarray): Reference image with liquid phase only (same shape as meas).
+        empty (np.ndarray): Reference image with gas phase only (same shape as meas).
+
+    Returns:
+        np.ndarray: Holdup fraction array with values in [0, 1] (same shape as input).
+    """
     holdup = np.log(meas / full) / np.log(empty / full)
     np.clip(holdup, 0, 1, out=holdup)
     return holdup

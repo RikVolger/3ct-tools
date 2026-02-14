@@ -3,9 +3,27 @@ import matplotlib.pyplot as plt
 
 
 def cate_to_astra(path, det, geom_scaling_factor=None, angles=None):
-    """Convert `Geometry` objects from our calibration package to the
-    ASTRA vector convention."""
+    """Convert Geometry objects from calibration package to ASTRA vector convention.
 
+    Loads a pickled geometry object from the CATE calibration package and converts
+    it to ASTRA's vector format. Optionally applies geometric scaling and can transform
+    geometries for multiple viewing angles.
+
+    Args:
+        path (str | Path): Path to the pickled geometry file.
+        det (dict): Detector configuration with keys 'rows', 'cols', 'pixel_width',
+            'pixel_height'.
+        geom_scaling_factor (float | None, optional): Factor to scale geometry vectors.
+            Defaults to None.
+        angles (list | None, optional): List of rotation angles (in degrees) to apply
+            to geometries. If None, only returns geometries without rotation.
+            Defaults to None.
+
+    Returns:
+        list | dict: If angles is None, returns a list of geometry vectors.
+                    If angles is provided, returns a dict with camera keys mapping
+                    to lists of geometry vectors for each angle.
+    """
     import pickle
     from cate import astra, xray
     from numpy.lib.format import read_magic, read_array_header_1_0, read_array_header_2_0
@@ -55,6 +73,22 @@ def cate_to_astra(path, det, geom_scaling_factor=None, angles=None):
 
 
 def pixel_coordinates(dX, dY, dZ, uX, uY, uZ, vX, vY, vZ, rows, cols):
+    """Calculate 3D coordinates of all detector pixels.
+
+    Computes the 3D carthesian coordinates (X, Y, Z) for every pixel in the detector
+    based on the detector center position and pixel spacing vectors.
+
+    Args:
+        dX, dY, dZ (float): Detector center position coordinates (cm).
+        uX, uY, uZ (float): Detector u-axis direction (horizontal spacing between pixels).
+        vX, vY, vZ (float): Detector v-axis direction (vertical spacing between pixels).
+        rows (int): Number of detector rows.
+        cols (int): Number of detector columns.
+
+    Returns:
+        tuple[np.ndarray, np.ndarray, np.ndarray]: Arrays x, y, z of shape (rows, cols)
+            containing the 3D coordinates of each pixel.
+    """
     # Create a 2D grid of row indices (i) and column indices (j)
     # Shape (rows, 1) the middle of the detector is at (0,0), so substract half the number of rows
     i_vals = np.arange(-rows // 2, rows // 2).reshape(-1, 1)
@@ -73,6 +107,22 @@ def pixel_coordinates(dX, dY, dZ, uX, uY, uZ, vX, vY, vZ, rows, cols):
 
 def d_through_column(x_coords, y_coords, z_coords, srcX, srcY, srcZ, det,
                      diameter_type='inner') -> np.ndarray:
+    """Calculate the distance a ray travels through a cylindrical column.
+
+    For each pixel on the detector, computes the distance traveled by the X-ray
+    from the source through the cylindrical column to the detector pixel.
+
+    Args:
+        x_coords, y_coords, z_coords (np.ndarray): Detector pixel coordinates (cm).
+        srcX, srcY, srcZ (float): X-ray source coordinates (cm).
+        det (dict): Detector configuration with 'column_inner_D' and/or
+            'column_outer_D' keys for inner and outer diameter (cm).
+        diameter_type (str, optional): Which column diameter to use: 'inner' or 'outer'.
+            Defaults to 'inner'.
+
+    Returns:
+        np.ndarray: 2D array of distances (cm) with same shape as input coordinates.
+    """
     # Directional vector is build up of a, b and c
     a = x_coords - srcX     # in x direction
     b = y_coords - srcY     # in y direction
@@ -126,7 +176,21 @@ def d_through_column(x_coords, y_coords, z_coords, srcX, srcY, srcZ, det,
 
 
 def plot_full_geom(geom_all_cams, det):
-    num_cam = len(geom_all_cams)    # number of cameras
+    """Plot the full geometry of the multi-camera setup.
+
+    Visualizes the positions of all cameras, X-ray sources, detectors, and the
+    cylindrical column in a 2D top-down view.
+
+    Args:
+        geom_all_cams (list): List of geometry vectors (tuples of 12 float values)
+            for each camera.
+        det (dict): Detector configuration with keys 'column_outer_D' (outer diameter
+            of the column in cm), 'rows', 'cols'.
+
+    Returns:
+        None: Displays the plot using matplotlib.
+    """
+    num_cam = len(geom_all_cams)
     fig, ax = plt.subplots()
 
     circle = plt.Circle((0, 0), det['column_outer_D'] / 2, fill=False)
@@ -157,6 +221,20 @@ def plot_full_geom(geom_all_cams, det):
 
 
 def calc_distances(geoms_all_cams, cam, det) -> np.ndarray:
+    """Calculate distances through column for a specific camera.
+
+    Computes both the inner and outer distances through the cylindrical column
+    for all pixels in the specified camera's detector.
+
+    Args:
+        geoms_all_cams (list): List of geometry vectors for all cameras.
+        cam (int): Camera index to calculate distances for.
+        det (dict): Detector configuration with required keys.
+
+    Returns:
+        tuple[np.ndarray, np.ndarray]: Tuple of (d_inner, d_outer) arrays, each
+            of shape (rows, cols) containing distances in cm.
+    """
     rows, cols = det['rows'], det['cols']
     (srcX, srcY, srcZ, dX, dY, dZ, uX, uY, uZ, vX, vY, vZ) = geoms_all_cams[cam]
 

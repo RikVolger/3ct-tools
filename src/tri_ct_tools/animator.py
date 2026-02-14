@@ -16,6 +16,27 @@ def create_animation(
         framerate: int = 22,
         fl: float | None = None,
         fcounter: int = 0):
+    """Create and save an animation from a series of multi-camera images.
+
+    Creates a matplotlib animation displaying images from multiple cameras side-by-side
+    with a time counter. The animation is saved as an AVI file.
+
+    Args:
+        output_folder (pathlib.Path): Directory where the animation file will be saved.
+        cameras (list): List of camera numbers to display.
+        image_series (np.ndarray): 4D array of shape (n_frames, n_cameras, height, width).
+        filename (str | None, optional): Name of the output file. If None, a name is
+            generated using fcounter and other parameters. Defaults to None.
+        frame_start (int, optional): Frame number offset for time display. Defaults to 0.
+        framerate (int, optional): Framerate of the animation in frames per second.
+            Defaults to 22.
+        fl (float | None, optional): Flow rate parameter used in filename generation.
+            Defaults to None.
+        fcounter (int, optional): Frame counter for filename generation. Defaults to 0.
+
+    Returns:
+        int: Updated fcounter value (fcounter + 1).
+    """
     # First dimension of image series is the number of frames
     n_frames = image_series.shape[0]
     fig, axs = plt.subplots(1, len(cameras), figsize=(10, 4), layout="constrained")

@@ -1,6 +1,8 @@
 from matplotlib.animation import FuncAnimation
 import pathlib
 import matplotlib.pyplot as plt
+import matplotlib as mpl
+import matplotlib.colors as mplc
 import numpy as np
 
 from tri_ct_tools.colors import blues9_map
@@ -12,6 +14,7 @@ def create_animation(
         cameras: list,
         image_series: np.ndarray,
         filename: str | None = None,
+        colormap: mplc.Colormap | str | None = None,
         frame_start: int = 0,
         framerate: int = 22,
         fl: float | None = None,
@@ -27,6 +30,9 @@ def create_animation(
         image_series (np.ndarray): 4D array of shape (n_frames, n_cameras, height, width).
         filename (str | None, optional): Name of the output file. If None, a name is
             generated using fcounter and other parameters. Defaults to None.
+        colormap (cmap | str | None): Colormap or name of the colormap to use. 
+            Name should be one of the colormaps in mpl.colormaps. Defaults to 
+            None, leading to tri_ct_tools.colors.blues9_map being used.
         frame_start (int, optional): Frame number offset for time display. Defaults to 0.
         framerate (int, optional): Framerate of the animation in frames per second.
             Defaults to 22.
@@ -37,6 +43,15 @@ def create_animation(
     Returns:
         int: Updated fcounter value (fcounter + 1).
     """
+    if colormap is None:
+        colormap = blues9_map
+    elif isinstance(colormap, str):
+        colormap = mpl.colormaps[colormap]
+    elif isinstance(colormap, mplc.Colormap):
+        colormap = colormap
+    else:
+        raise ValueError(f"Input colormap ({type(colormap)}) should be None, "
+                         f"str or an instance of matplotlib.colors.Colormap.")
     # First dimension of image series is the number of frames
     n_frames = image_series.shape[0]
     fig, axs = plt.subplots(1, len(cameras), figsize=(10, 4), layout="constrained")
@@ -44,7 +59,7 @@ def create_animation(
     for i, c in enumerate(cameras):
         current_images.append(axs[i].imshow(image_series[0, i, :, :],
                                             aspect='equal',
-                                            cmap=blues9_map,
+                                            cmap=colormap,
                                             vmin=0,
                                             vmax=.5))
         axs[i].axis('off')

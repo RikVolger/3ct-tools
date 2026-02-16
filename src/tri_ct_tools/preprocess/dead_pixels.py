@@ -2,6 +2,7 @@ import os
 import sys
 import filecmp
 import yaml
+import warnings
 import numpy as np
 from datetime import datetime
 from pathlib import Path
@@ -294,7 +295,10 @@ def find_subdirectories(directory: Path, subdirectories=None) -> list[Path]:
     return subdirectories
 
 
-def list_subdirectories(source_dir: str | list, target_dir: str | list) -> tuple[list, list]:
+def list_subdirectories(
+        source_dir: str | list,
+        target_dir: str | list
+        ) -> tuple[list[Path], list[Path]]:
     """Map source directories to target directories for batch processing.
 
     Handles both single directory pairs and multiple source/target directory pairs.
@@ -489,9 +493,10 @@ def pick_dark(source_dir, darks):
         # Crop to source image size
         dark_img = dark_img[:, VROI[0]:VROI[1], :]
     else:
-        raise LookupError(f"Could not find dark image for {source_dir}. No dark "
-                          "images with the same framerate and equal or larger "
-                          "image size provided.")
+        warnings.warn(f"Could not find dark image for {source_dir}. No dark "
+                      "images with the same framerate and equal or larger "
+                      "image size provided.", stacklevel=2)
+        dark_img = None
 
     return dark_img
 
@@ -508,7 +513,7 @@ def main(root_source_dir, root_target_dir):
         root_target_dir (Path | bool): Root target directory or False to use config.
     """
     # initial processing of raw data (dead pixel correction, rotate, flip, contrast)
-    with open(R'D:\XRT paper\XRay\dead_pixel_correction.yaml') as dp_file:
+    with open(R'D:\XRay\Database\Nov-2023_salts\dead_pixel_correction_part2.yaml') as dp_file:
         config = yaml.safe_load(dp_file)
     if not root_source_dir:
         root_source_dir = config['input_folder']
@@ -531,8 +536,14 @@ def main(root_source_dir, root_target_dir):
         # skip already preprocessed directories
         if 'preprocessed' in source_dir.name:
             continue
+        if 'error' in source_dir.name.lower():
+            continue
 
         dark_images = pick_dark(source_dir, darks)
+        if dark_images is None:
+            warnings.warn(f"No matching dark image for {source_dir}. Skipping.",
+                          stacklevel=2)
+            continue
 
         # Make output directory
         preprocessed_dir = target_dir / source_dir.name

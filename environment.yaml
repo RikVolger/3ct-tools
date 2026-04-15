@@ -1,7 +1,9 @@
 name: tri-ct-tools
 channels:
+  - conda-forge
   - defaults
 dependencies:
+  - python >=3.11
   - pyyaml
   - conda-forge::conda-build
   - pandas

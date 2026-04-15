@@ -501,7 +501,7 @@ def pick_dark(source_dir, darks):
     return dark_img
 
 
-def main(root_source_dir, root_target_dir):
+def main(config_path=R'inputs\dead_pixel_multisource.yaml'):
     """Main processing pipeline for dead pixel correction of X-ray images.
 
     Processes raw X-ray detector data by applying dark frame subtraction and
@@ -509,15 +509,15 @@ def main(root_source_dir, root_target_dir):
     Processes all camera folders recursively from source directories.
 
     Args:
-        root_source_dir (Path | bool): Root source directory or False to use config.
-        root_target_dir (Path | bool): Root target directory or False to use config.
+        config_path (Path): Path to config file to use. Defaults to the file 
+            `dead_pixel_multisource.yaml` in `inputs/`
     """
     # initial processing of raw data (dead pixel correction, rotate, flip, contrast)
-    with open(R'D:\XRay\Database\Nov-2023_salts\dead_pixel_correction_part2.yaml') as dp_file:
+    with open(config_path) as dp_file:
         config = yaml.safe_load(dp_file)
-    if not root_source_dir:
-        root_source_dir = config['input_folder']
-        root_target_dir = config['output_folder']
+
+    root_source_dir = config['input_folder']
+    root_target_dir = config['output_folder']
 
     copy_raw = bool(config['copy_raw'])
     avg_only = bool(config['avg_only'])
@@ -598,7 +598,8 @@ def main(root_source_dir, root_target_dir):
                 framerange = range(framestart, n_frames)
                 # read mean of img files in the folder
                 img_array = singlecam_mean(camdir, framerange, img_shape,
-                                           dark=dark_img, quiet=True)
+                                           dark=dark_img, quiet=True,
+                                           use_existing=False)
                 # apply dpc to mean img
                 img_array = dead_pixel_correction(img_array, n_cam, offsets,
                                                   VROI)
@@ -618,25 +619,12 @@ def main(root_source_dir, root_target_dir):
 
 
 if __name__ == "__main__":
-    # 4 ways to use:
-    # 0. Provide no command line arguments. You will be prompted for a source
-    #   directory. For the rest of the behaviour, see 1
-    # 1. Provide only source directory. Expected to have a `raw` folder in there,
-    #   with the folders with pictures. Output will be written to
-    #   `source / preprocessed`.
-    # 2. Provide both source and target. Source is expected to immediately have
-    #   experiment folders in there. Output will be written to the target
-    #   directory
-    # 3. Provide source, target and a copy-raw flag. If the copy-raw flag is
-    #   True, copy the raw files to `target / raw`.
+    # 2 ways to use:
+    # 0. Provide no command line arguments. The YAML config in `inputs/` will be
+    #   used for in- and outputs
+    # 1. Provide the path to a config YAML in command line, this will be used.
     if len(sys.argv) > 1:
-        source_dir = Path(sys.argv[1])
+        config_path = Path(sys.argv[1])
+        main(config_path)
     else:
-        source_dir = False
-
-    if len(sys.argv) > 2:
-        target_dir = Path(sys.argv[2])
-    else:
-        target_dir = False
-
-    main(source_dir, target_dir)
+        main()

@@ -51,7 +51,8 @@ def single(img_file=None, img_folder=None, frame=None, quiet=False):
     raise ValueError
 
 
-def singlecam_mean(cam_folder: Path, frames, img_shape, dark=None, quiet=False):
+def singlecam_mean(cam_folder: Path, frames, img_shape, dark=None, quiet=False,
+                   use_existing=True):
     """Read the frames in cam_folder, and return a time-averaged image
 
     Args:
@@ -67,7 +68,7 @@ def singlecam_mean(cam_folder: Path, frames, img_shape, dark=None, quiet=False):
     img = np.zeros(img_shape)
     print_reading(cam_folder, quiet)
     average_file = cam_folder / 'average.tif'
-    if average_file.exists():
+    if use_existing and average_file.exists():
         img = tifffile.imread(average_file).astype(np.int16)
     else:
         img_files = [cam_folder / f"img_{fr}.tif" for fr in frames]

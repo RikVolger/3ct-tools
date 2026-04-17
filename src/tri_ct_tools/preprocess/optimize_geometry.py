@@ -312,28 +312,30 @@ def geometry_optimizer(
     output_path = img_path_base / '00_calib'
     output_path.mkdir(exist_ok=True)
 
-    for cam in cameras:
-        d, _ = calc_distances(geoms_optim, cam, det)
-        np.save(output_path / f'distances_cam{cam+1}.npy', d)
-        path_full = img_path_base / full_img_folder / f"camera {cam+1}"
-        path_empty = img_path_base / empty_img_folder / f"camera {cam+1}"
-        img_full = singlecam_mean(path_full, framerange, img_shape)
-        img_empty = singlecam_mean(path_empty, framerange, img_shape)
+    # Code to save some of the intermediate analyses making it easier to inspect
+    # later. Saves large datafiles and is not usually needed. Uncomment to use.
+    # for cam in cameras:
+    #     d, _ = calc_distances(geoms_optim, cam, det)
+    #     np.save(output_path / f'distances_cam{cam+1}.npy', d)
+    #     path_full = img_path_base / full_img_folder / f"camera {cam+1}"
+    #     path_empty = img_path_base / empty_img_folder / f"camera {cam+1}"
+    #     img_full = singlecam_mean(path_full, framerange, img_shape)
+    #     img_empty = singlecam_mean(path_empty, framerange, img_shape)
 
-        ln_intensity = -np.log(img_full / img_empty)
-        effective_attenuation = ln_intensity / d
+    #     ln_intensity = -np.log(img_full / img_empty)
+    #     effective_attenuation = ln_intensity / d
 
-        result = pd.DataFrame()
-        result['distance_liquid'] = d.flatten()
-        result['-ln_intensity'] = ln_intensity.flatten()
-        result['effective_attenuation'] = effective_attenuation.flatten()
-        result.to_csv(output_path / f'intensity_cam{cam+1}.csv')
+    #     result = pd.DataFrame()
+    #     result['distance_liquid'] = d.flatten()
+    #     result['-ln_intensity'] = ln_intensity.flatten()
+    #     result['effective_attenuation'] = effective_attenuation.flatten()
+    #     result.to_csv(output_path / f'intensity_cam{cam+1}.csv')
 
-        metadata = {
-            'src_full': path_full,
-            'src_empty': path_empty
-        }
-        pd.DataFrame(metadata, index=[1]).to_csv(output_path / f'intensity_cam{cam+1}_metadata.csv')
+    #     metadata = {
+    #         'src_full': path_full,
+    #         'src_empty': path_empty
+    #     }
+    #     pd.DataFrame(metadata, index=[1]).to_csv(output_path / f'intensity_cam{cam+1}_metadata.csv')
 
     np.save(output_path / 'bhc_optimized_geom.npy', geoms_optim)
 
@@ -343,14 +345,14 @@ def geometry_optimizer(
 
 if __name__ == "__main__":
     # path to geometry
-    geom_path = Path(R'd:\XRT paper\XRay\2025-06-13\00_calib'
-                     R'\NeedleCalibration_5degps\geom.npy')
-    img_path_base = Path(R'd:\XRT paper\XRay\2025-06-26')
-    full_img_path = '03_scattercorrected/1500x1500Crop_Full_120kV_22Hz'
-    empty_img_path = '03_scattercorrected/1500x1500Crop_Empty_120kV_22Hz'
+    geom_path = Path(R'u:\Xray RPT ChemE\X-ray\Xray_data\2025-12-03 Rik and Jule'
+                     R'\00_calib\NeedleCalibration_5degps\geom.npy')
+    img_path_base = Path(R'u:\Xray RPT ChemE\X-ray\Xray_data\2025-12-04 Rik and Jule')
+    full_img_path = R'02_preprocessed\ButOH_0gl_NH4Cl_0gl_0lmin'
+    empty_img_path = R'02_preprocessed\Empty'
 
     det = {
-        "rows": 1524,        # Number of rows in the detector
+        "rows": 500,        # Number of rows in the detector
         "cols": 1548,        # Number of columns in the detector
         "pixel_width": 0.0198,      # Pixel width in cm
         "pixel_height": 0.0198,     # Pixel height in cm

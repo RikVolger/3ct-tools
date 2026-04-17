@@ -277,7 +277,7 @@ if __name__ == "__main__":
         else:
             dark_path = None
             img_dark = None
-        empty_copy_path = root / s['empty_copy']
+        # empty_copy_path = root / s['empty_copy']
 
         print(f"\nRunning beam hardening correction for {name}")
 
@@ -308,7 +308,8 @@ if __name__ == "__main__":
                 'poly_coefficients': coeff
             }
             # Even though BHC does nothing on empty, want to have it in the same folder.
-            array_to_tif(img_empty, empty_copy_path / f"camera {cam+1}", 'average.tif')
+            # Update: bhc-only affects empty image too (likely). Need to include in corrections.
+            # array_to_tif(img_empty, empty_copy_path / f"camera {cam+1}", 'average.tif')
 
             output_file = meas_output_cam / f'bhc_coefficients_cam{cam+1}.yaml'
             with open(output_file, 'w') as outfile:

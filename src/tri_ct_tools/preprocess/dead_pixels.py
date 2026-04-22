@@ -512,6 +512,7 @@ def main(config_path=R'inputs\dead_pixel_multisource.yaml'):
         config_path (Path): Path to config file to use. Defaults to the file 
             `dead_pixel_multisource.yaml` in `inputs/`
     """
+    print(f"Reading config from {config_path}")
     # initial processing of raw data (dead pixel correction, rotate, flip, contrast)
     with open(config_path) as dp_file:
         config = yaml.safe_load(dp_file)

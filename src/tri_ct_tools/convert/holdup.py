@@ -22,7 +22,13 @@ def two_point_holdup(meas, full, empty):
     Returns:
         np.ndarray: Holdup fraction array with values in [0, 1] (same shape as input).
     """
-    holdup = np.log(meas / full) / np.log(empty / full)
+    # Make sure no 0 values are encountered (result in nan at np.log)
+    np.clip(full, 1, None, out=full)
+    top = np.clip(meas / full, 1e-15, None)
+    bot = np.clip(empty / full, 1e-15, None)
+    # Avoid log(1) = 0 in denominator by replacing exact 1.0 values
+    bot = np.where(bot == 1.0, 1.0000001, bot)
+    holdup = np.log(top) / np.log(bot)
     np.clip(holdup, 0, 1, out=holdup)
     return holdup
 

@@ -1,3 +1,4 @@
+import sys
 import numpy as np
 import yaml
 from pathlib import Path
@@ -146,4 +147,12 @@ def scatter_correct(yaml_file="inputs/scatter.yaml"):
 
 
 if __name__ == "__main__":
-    scatter_correct(R"D:\XRT paper\XRay\scatter.yaml")
+    # 2 ways to use:
+    # 0. Provide no command line arguments. The YAML config in `inputs/` will be
+    #   used for in- and outputs
+    # 1. Provide the path to a config YAML in command line, this will be used.
+    if len(sys.argv) > 1:
+        config_path = Path(sys.argv[1])
+        scatter_correct(config_path)
+    else:
+        scatter_correct()

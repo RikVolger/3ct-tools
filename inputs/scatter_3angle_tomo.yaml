@@ -20,7 +20,7 @@ scatter_IDs:
 # average flag - if True, scatter correction is done on average images. If
 # false, scatter-correction is done per-frame. Per-frame behaviour is currently
 # undefined
-average: True
+average: False
 frames:
   measurement:
     start: 50

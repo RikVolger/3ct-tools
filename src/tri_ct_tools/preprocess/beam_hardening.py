@@ -230,7 +230,8 @@ def get_coefficients(det, ROI, geoms_all_cams, cam, img_full, img_empty):
 
 if __name__ == "__main__":
 
-    input_file = Path(R"D:\XRT paper\XRay\bhc_3angle_tomo.yaml")
+    input_file = Path(R"inputs\bhc_3angle_tomo.yaml")
+    # input_file = Path(R"D:\XRay\Database\Nov-2023_salts\bhc.yaml")
     with open(input_file) as bhc_yaml:
         bhc_input = yaml.safe_load(bhc_yaml)
 

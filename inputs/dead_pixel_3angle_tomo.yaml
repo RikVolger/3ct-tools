@@ -11,10 +11,10 @@ output_folder:
 # - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-12 Rik Cropper\02_preprocessed
 # - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-13 Rik Cropper\02_preprocessed
 # - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-19 Rik\02_preprocessed
-# - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed
-# - U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\02_preprocessed
-- D:\XRay\3ct_data\2025-06-26 Rik\02_preprocessed
-- D:\XRay\3ct_data\2025-06-27 Rik\02_preprocessed
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-26 Rik\02_preprocessed
+- U:\Xray RPT ChemE\X-ray\Xray_data\2025-06-27 Rik\02_preprocessed
+# - D:\XRay\3ct_data\2025-06-26 Rik\02_preprocessed
+# - D:\XRay\3ct_data\2025-06-27 Rik\02_preprocessed
 # - U:\Xray RPT ChemE\X-ray\Xray_data\2025-07-07 Rik\02_preprocessed
 # - U:\Xray RPT ChemE\X-ray\Xray_data\2025-07-09 Rik\02_preprocessed
 # Darks: If a single folder is provided, this will be used for all. If image sizes
@@ -32,7 +32,10 @@ darkframes:
   step: 1
 copy_raw: False
 # avg_only allows to only save the average as preprocessed, saving storage
-avg_only: True
+# BUG: averaging at this point introduces dynamic bias error in the holdup
+#   By averaging before taking the logarithm, the holdup is not calculated 
+#   correctly. Don't use this option.
+avg_only: False
 # framestart is only used for making averages
 framestart: 50
 subtract_dark: True

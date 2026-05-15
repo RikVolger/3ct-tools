@@ -7,7 +7,7 @@ import matplotlib.pyplot as plt
 import yaml
 
 from tri_ct_tools.convert.geometry import calc_distances, cate_to_astra, plot_full_geom
-from tri_ct_tools.image.reader import singlecam_mean
+from tri_ct_tools.image.reader import single_img, singlecam_mean
 from tri_ct_tools.image.writer import array_to_tif
 
 

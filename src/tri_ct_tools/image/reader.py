@@ -20,7 +20,7 @@ def print_reading(file, quiet=False):
     print(f"Reading {file}")
 
 
-def single(img_file=None, img_folder=None, frame=None, quiet=False):
+def single_img(img_file=None, img_folder=None, frame=None, quiet=False):
     """Load and return a single image
 
     Args:

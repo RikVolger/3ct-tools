@@ -7,7 +7,7 @@ import numpy as np
 from datetime import datetime
 from pathlib import Path
 
-from tri_ct_tools.image.reader import single, singlecam_mean
+from tri_ct_tools.image.reader import single_img, singlecam_mean
 from tri_ct_tools.image.writer import array_to_tif
 
 
@@ -362,7 +362,7 @@ def process_file(i, file: Path, n_cam, VROI, target_dir, total_files, offsets, d
         print(f"\nFile {file.name} already exists, skipping")
     else:
         print(f"Frame number {i + 1} / {total_files}", end='\r', flush=True)
-        image_array = single(file, quiet=True)
+        image_array = single_img(file, quiet=True)
         np.clip(image_array - dark_img, 0, None, out=image_array)
 
         image_array = dead_pixel_correction(image_array, n_cam, offsets, VROI=VROI)
@@ -397,7 +397,7 @@ def load_darks(config):
     if isinstance(dirs, str):
         dark_path = Path(dirs)
         cam_folders = list(dark_path.glob("camera*"))
-        img_shape = single(cam_folders[0] / 'img_10.tif').shape
+        img_shape = single_img(cam_folders[0] / 'img_10.tif').shape
         dark_img = np.zeros((len(cam_folders), *img_shape), dtype=np.int16)
         for i, cam_folder in enumerate(cam_folders):
             assert cam_folder.is_dir()
@@ -418,7 +418,7 @@ def load_darks(config):
     for dir in dirs:
         dark_path = Path(dir)
         cam_folders = list(dark_path.glob("camera*"))
-        img_shape = single(cam_folders[0] / 'img_10.tif').shape
+        img_shape = single_img(cam_folders[0] / 'img_10.tif').shape
         # load images
         dark_img = np.zeros((len(cam_folders), *img_shape), dtype=np.int16)
         for i, cam_folder in enumerate(cam_folders):
@@ -471,7 +471,7 @@ def pick_dark(source_dir, darks):
         return darks
     source_settings = read_detector_settings(source_dir)
     cam_folders = list(source_dir.glob("camera*"))
-    img_shape = single(cam_folders[0] / 'img_10.tif').shape
+    img_shape = single_img(cam_folders[0] / 'img_10.tif').shape
 
     (cam_mode, VROI, framerate, timestamp, cameras) = source_settings
 
@@ -592,7 +592,7 @@ def main(config_path=R'inputs\dead_pixel_multisource.yaml'):
 
             print(f"Processing files in {camdir}")
             img_list = list(camdir.glob("img_*.tif"))
-            img_shape = single(img_list[0], quiet=True).shape
+            img_shape = single_img(img_list[0], quiet=True).shape
             if avg_only:
                 # Determine framerange from number of 'img_*.tif' files.
                 n_frames = len(img_list)

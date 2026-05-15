@@ -1,12 +1,14 @@
+import asyncio
 from pathlib import Path
 
 import numpy as np
 import tifffile
 
 from tri_ct_tools.image.writer import array_to_tif
+from tri_ct_tools.image.common import Image
 
 
-def print_reading(file, quiet):
+def print_reading(file, quiet=False):
     """Print a message indicating that a file is being read.
 
     Args:
@@ -94,7 +96,7 @@ def singlecam_series(cam_folder, frames, img_shape, dark=None, quiet=False):
     Returns:
         np.ndarray: 3D array of size (n_frames, width, height) containing images
     """
-    scan_img = np.zeros((len(frames), *img_shape))
+    scan_img = np.zeros((len(frames), *img_shape), dtype=np.int16)
     print_reading(cam_folder, quiet)
     img_files = [cam_folder / f"img_{fr}.tif" for fr in frames]
     scan_img[:, :, :] = tifffile.imread(img_files).astype(np.int16)
@@ -145,3 +147,17 @@ def multicam_series(exp_folder, cameras, frames, img_shape, dark=None, quiet=Fal
         img_folder = exp_folder / f"camera {c}"
         scan_img[:, i, :, :] = singlecam_series(img_folder, frames, img_shape, dark, quiet)
     return scan_img
+
+
+async def fetch_image_async(queue: asyncio.Queue[Image], image_list: list[Image]):
+    """Asynchronously read images from disk and enqueue them for processing.
+
+    Args:
+        queue (asyncio.Queue[Image]): Queue to place loaded images.
+        image_list (list[Image]): List of Image objects with paths to load.
+    """
+    for img in image_list:
+        # print(f"reading {img.name}")
+        img.img = await asyncio.to_thread(tifffile.imread, img.path)
+        await queue.put(img)
+    await queue.put(None)

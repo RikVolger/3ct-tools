@@ -39,7 +39,8 @@ def BHC(I_BH, I_empty, coefficients, mu_eff, offset):
 
     I_noBH = np.exp(-mu_eff * x_fit_values - offset) * I_empty
 
-    # After beam hardening corrections, nan values can appear in image. Interpolate.
+    # After beam hardening corrections, nan values can appear in image. Those
+    # will be interpolated from neighbours.
     if np.any(np.isnan(I_noBH)):
         nanmask = np.isnan(I_noBH)
         I_noBH[nanmask] = np.interp(
@@ -86,6 +87,8 @@ def log_line_plot(
         cam,
         geoms_all_cams,
         det,
+        framerange,
+        img_shape,
         row_start=740,
         row_end=760):
     """Create diagnostic plots for beam hardening analysis.
@@ -282,34 +285,36 @@ def main(input_file=R"inputs\beam_hardening_corrections.yaml"):
         print(f"\nRunning beam hardening correction for {name}")
 
         for meas, cam in itertools.product(s['meas'], cameras):
+            # Deal with dark images (NOTE: Should not be used anymore)
             if dark_path is not None:
                 dark_path_cam = dark_path / f"camera {cam+1}"
                 img_dark = singlecam_mean(dark_path_cam, framerange['dark'], img_shape)
+            # Load full and empty references
             full_path_cam = full_path / f"camera {cam+1}"
             empty_path_cam = empty_path / f"camera {cam+1}"
-            meas_path_cam = root / meas['input'] / f"camera {cam+1}"
+            meas_path_cam: Path = root / meas['input'] / f"camera {cam+1}"
             img_full = singlecam_mean(full_path_cam, framerange['full'], img_shape, img_dark)
             img_empty = singlecam_mean(empty_path_cam, framerange['empty'], img_shape, img_dark)
-            if "Full" in str(meas_path_cam):
-                img_meas = singlecam_mean(meas_path_cam, framerange['full'], img_shape, img_dark)
-            else:
-                img_meas = singlecam_mean(meas_path_cam, framerange['meas'], img_shape, img_dark)
+
+            # Calculate beam hardening correction coefficients from those
             coeff, mu_eff, offset = get_coefficients(det, ROI, geoms_all_cams,
                                                      cam, img_full, img_empty)
 
-            meas_bhc = BHC(img_meas, img_empty, coeff, mu_eff, offset)
+            # Process measured images
+            img_paths = meas_path_cam.glob("img_*.tif")
+            for path in img_paths:
+                img_meas = single_img(path)
+                img_bhc = BHC(img_meas, img_empty, coeff, mu_eff, offset)
 
-            meas_output_path = root / meas['output']
-            meas_output_cam = meas_output_path / f"camera {cam+1}"
-            array_to_tif(meas_bhc.astype(np.int32), meas_output_cam, 'average.tif')
+                meas_output_path = root / meas['output']
+                meas_output_cam = meas_output_path / f"camera {cam+1}"
+                array_to_tif(img_bhc.astype(np.int16), meas_output_cam, path.name)
+
             bhc_coefficients = {
                 'mu_eff': mu_eff,
                 'offset': offset,
                 'poly_coefficients': coeff
             }
-            # Even though BHC does nothing on empty, want to have it in the same folder.
-            # Update: bhc-only affects empty image too (likely). Need to include in corrections.
-            # array_to_tif(img_empty, empty_copy_path / f"camera {cam+1}", 'average.tif')
 
             output_file = meas_output_cam / f'bhc_coefficients_cam{cam+1}.yaml'
             with open(output_file, 'w') as outfile:
@@ -321,8 +326,10 @@ if __name__ == "__main__":
     # 0. Provide no command line arguments. The YAML config in `inputs/` will be
     #   used for in- and outputs
     # 1. Provide the path to a config YAML in command line, this will be used.
-    if len(sys.argv) > 1:
+    if len(sys.argv) == 1:
+        main()
+    elif len(sys.argv) == 2:
         config_path = Path(sys.argv[1])
         main(config_path)
     else:
-        main()
+        raise TypeError("beam_hardening.py takes up to 1 command line argument. More were provided.")

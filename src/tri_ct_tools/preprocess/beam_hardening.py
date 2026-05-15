@@ -1,5 +1,6 @@
 import itertools
 from pathlib import Path
+import sys
 import numpy as np
 
 import matplotlib.pyplot as plt
@@ -228,10 +229,8 @@ def get_coefficients(det, ROI, geoms_all_cams, cam, img_full, img_empty):
     return coeff, mu_eff, offset
 
 
-if __name__ == "__main__":
-
-    input_file = Path(R"inputs\bhc_3angle_tomo.yaml")
-    # input_file = Path(R"D:\XRay\Database\Nov-2023_salts\bhc.yaml")
+def main(input_file=R"inputs\beam_hardening_corrections.yaml"):
+    input_file = Path(input_file)
     with open(input_file) as bhc_yaml:
         bhc_input = yaml.safe_load(bhc_yaml)
 
@@ -315,3 +314,15 @@ if __name__ == "__main__":
             output_file = meas_output_cam / f'bhc_coefficients_cam{cam+1}.yaml'
             with open(output_file, 'w') as outfile:
                 yaml.dump(bhc_coefficients, outfile, default_flow_style=False)
+
+
+if __name__ == "__main__":
+    # 2 ways to use:
+    # 0. Provide no command line arguments. The YAML config in `inputs/` will be
+    #   used for in- and outputs
+    # 1. Provide the path to a config YAML in command line, this will be used.
+    if len(sys.argv) > 1:
+        config_path = Path(sys.argv[1])
+        main(config_path)
+    else:
+        main()

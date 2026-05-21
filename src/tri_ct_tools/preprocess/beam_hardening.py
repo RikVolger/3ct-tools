@@ -308,6 +308,7 @@ def main(input_file=R"inputs\beam_hardening_corrections.yaml"):
 
                 meas_output_path = root / meas['output']
                 meas_output_cam = meas_output_path / f"camera {cam+1}"
+                print(f"Writing {path.absolute()}")
                 array_to_tif(img_bhc.astype(np.int16), meas_output_cam, path.name)
 
             bhc_coefficients = {

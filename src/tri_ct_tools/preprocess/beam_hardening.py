@@ -301,9 +301,10 @@ def main(input_file=R"inputs\beam_hardening_corrections.yaml"):
                                                      cam, img_full, img_empty)
 
             # Process measured images
+            print(f"Reading from {meas_path_cam.absolute()}")
             img_paths = meas_path_cam.glob("img_*.tif")
             for path in img_paths:
-                img_meas = single_img(path)
+                img_meas = single_img(path, quiet=True)
                 img_bhc = BHC(img_meas, img_empty, coeff, mu_eff, offset)
 
                 meas_output_path = root / meas['output']

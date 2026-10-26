@@ -514,7 +514,7 @@ def main(config_path=R'inputs\dead_pixel_multisource.yaml'):
     """
     print(f"Reading config from {config_path}")
     # initial processing of raw data (dead pixel correction, rotate, flip, contrast)
-    with open(config_path) as dp_file:
+    with open(R'C:\Xray_recon_Git\3ct-tools\inputs\dead_pixel_multisource.yaml') as dp_file:
         config = yaml.safe_load(dp_file)
 
     root_source_dir = config['input_folder']
